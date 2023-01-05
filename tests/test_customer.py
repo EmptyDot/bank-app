@@ -24,3 +24,14 @@ class TestCustomer:
     def test_add_account_wrong_type(self):
         c = Customer("Bob", "123456789")
         assert c.add_account("Hi") is False
+
+    def test___eq__true(self):
+        bob = Customer("Bob", "123")
+        bob2 = Customer("Bob", "123")
+        assert bob is not bob2 and bob == bob2
+
+    def test___eq__false(self):
+        bob = Customer("Bob", "123")
+        alice = Customer("Alice", "456")
+        assert bob != alice
+        

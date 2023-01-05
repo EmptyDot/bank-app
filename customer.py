@@ -25,3 +25,10 @@ class Customer:
             self.accounts.append(account)
             return True
         return False
+
+    def __eq__(self, other):
+        return isinstance(other, Customer) \
+            and self.name == other.name \
+            and self.password == other.password \
+            and self.accounts == other.accounts
+
