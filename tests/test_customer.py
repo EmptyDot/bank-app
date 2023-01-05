@@ -34,4 +34,7 @@ class TestCustomer:
         bob = Customer("Bob", "123")
         alice = Customer("Alice", "456")
         assert bob != alice
-        
+
+    def test___eq__wrong_type(self):
+        bob = Customer("Bob", "123")
+        assert bob != "bob"
