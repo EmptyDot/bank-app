@@ -12,40 +12,157 @@ class Bank:
         self.current_user: Optional[Customer] = None
 
     def get_customers(self) -> list[Customer]:
-        pass
+        """
+        List all customers
+        :return: The list of customers
+        """
+        return self.customers
 
     def add_customer(self, name: str, password: str) -> bool:
-        pass
+        """
+        Add a new customer
+        :param name: Username of the customer. Should be unique.
+        :param password: Password of the customer.
+        :return: True if successful else False
+        """
+
+        if all(customer.name != name for customer in self.customers):
+            customer = Customer(name, password)
+            self.customers.append(customer)
+            return True
+
+        return False
 
     def get_customer(self, name: str) -> Customer | None:
-        pass
-
-    def remove_customer(self) -> bool:
-        pass
+        """
+        Get a customer by name
+        :param name: Username of a customer
+        :return: The customer matching the name
+        """
+        for customer in self.customers:
+            if customer.name == name:
+                return customer
 
     def change_customer_password(self, name: str, new_password: str) -> bool:
-        pass
+        """
+        Change a customers password
+        :param name: Name of the customer
+        :param new_password: The new password
+        :return: True if successful else False
+        """
+
+        if customer := self.get_customer(name):
+            customer.password = new_password
+            return True
+        return False
+
+    def remove_customer(self, name: str) -> bool:
+        """
+        Remove a customer
+        :param name: Name of the customer
+        :return: True if successful else False
+        """
+        if customer := self.get_customer(name):
+            try:
+                self.customers.remove(customer)
+                return True
+            except ValueError:
+                pass
+
+        return False
 
     def login(self, name: str, password: str) -> bool:
-        pass
+        """
+        If the password matches, add this customer from the list of customers as the new logged in customer.
+        :param name: Name of the customer
+        :param password: Password of the customer
+        :return: True if successful else False
+        """
+        if customer := self.get_customer(name):
+            if customer.check_password(password):
+                self.current_user = customer
+                return True
+        return False
 
     def logout(self) -> bool:
-        pass
+        """
+        Log out the currently logged in customer
+        :return: True if successful else False
+        """
+        if self.current_user:
+            self.current_user = None
+            return True
+        return False
 
-    def get_accounts(self) -> list[Account]:
-        pass
+    def get_accounts(self) -> list[Account] | None:
+        """
+        Get all accounts that belong to the currently logged in customer
+        :return: The list of accounts
+        """
+        if self.current_user:
+            return self.current_user.accounts
 
     def add_account(self, account_number: int) -> bool:
-        pass
+        """
+        Add an account to the currently logged in customer.
+        :param account_number: Account number of the new account.
+        :return: True if successful else False
+        """
+        if self.current_user:
+            if all(
+                user_account.account_number != account_number
+                for user_account in self.current_user.accounts
+            ):
+                acc = Account(account_number)
+                return self.current_user.add_account(acc)
+        return False
 
     def remove_account(self, account_number: int) -> bool:
-        pass
+        """
+        Remove an account from the currently logged in customer.
+        :param account_number: Account number of the account.
+        :return: True if successful else False
+        """
+        if account := self.get_account(account_number):
+            try:
+                self.current_user.accounts.remove(account)
+                return True
+            except ValueError:
+                pass
+
+        return False
 
     def get_account(self, account_number: int) -> Account | None:
-        pass
+        """
+        Get an account from the currently logged in customer.
+        :param account_number: Account number of the account.
+        :return: The account matching the account number.
+        """
+        if accounts := self.get_accounts():
+            for account in accounts:
+                if account.account_number == account_number:
+                    return account
 
     def deposit(self, account_number: int, amount: int | float) -> bool:
-        pass
+        """
+        Deposit money to an account.
+        :param account_number: Account number of the account.
+        :param amount: The amount to be added.
+        :return: True if successful else False
+        """
+        if account := self.get_account(account_number):
+            return account.balance_add(amount)
+
+        return False
 
     def withdraw(self, account_number: int, amount: int | float) -> bool:
-        pass
+        """
+        Withdraw money from an account.
+        :param account_number: Account number of the account.
+        :param amount: The amount to be subtracted.
+        :return: True if successful else False
+        """
+        if account := self.get_account(account_number):
+            return account.balance_sub(amount)
+
+        return False
