@@ -18,10 +18,15 @@ class TestAccount:
         acc = Account(123, 0.005)
         assert acc.get_balance() == 0.01
 
-    def test_balance_add(self):
+    def test_balance_add_int(self):
         acc = Account(123, 1)
         acc.balance_add(1)
         assert acc.get_balance() == 2
+
+    def test_balance_add_float(self):
+        acc = Account(123, 1)
+        acc.balance_add(1.6)
+        assert acc.get_balance() == 2.6
 
     def test_balance_add_negative(self):
         amount = 100
@@ -33,10 +38,15 @@ class TestAccount:
         acc = Account(123, 1)
         assert acc.balance_add("one") is False
 
-    def test_balance_sub(self):
+    def test_balance_sub_int(self):
         acc = Account(123, 2)
         acc.balance_sub(1)
         assert acc.get_balance() == 1
+
+    def test_balance_sub_float(self):
+        acc = Account(123, 1)
+        acc.balance_sub(0.4)
+        assert acc.get_balance() == 0.6
 
     def test_balance_sub_negative(self):
         amount = 100
@@ -51,7 +61,7 @@ class TestAccount:
     def test_balance_sub_withdraw_more_then_balance(self):
         acc = Account(123, 1)
         assert acc.balance_sub(2) is False
-        assert acc.get_balance() > 0
+        assert acc.get_balance() == 1
 
     def test_balance_sub_withdraw_all(self):
         acc = Account(123, 1)

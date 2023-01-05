@@ -25,7 +25,7 @@ class Account:
         if not isinstance(amount, (int, float)) or amount <= 0:
             return False
 
-        self.balance = self.balance + amount
+        self.balance = self.balance + Decimal(amount)
         return True
 
     def balance_sub(self, amount: int | float) -> bool:
@@ -37,7 +37,7 @@ class Account:
         if not isinstance(amount, (int, float)) or amount <= 0 or amount > self.balance:
             return False
 
-        self.balance = self.balance - amount
+        self.balance = self.balance - Decimal(amount)
         return True
 
     def __str__(self):
