@@ -166,3 +166,9 @@ class Bank:
             return account.balance_sub(amount)
 
         return False
+
+    def __str__(self):
+        return f"Bank({self.get_customers()}, current_user={self.current_user})"
+
+    def __repr__(self):
+        return f"Bank({self.get_customers()}, current_user={self.current_user})"

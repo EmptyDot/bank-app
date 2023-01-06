@@ -5,9 +5,9 @@ getcontext()
 
 
 class Account:
-    def __init__(self, account_number: int, initial_balance: int | float = 0):
+    def __init__(self, account_number: int, balance: int | float = 0):
         self.account_number = account_number
-        self.balance = Decimal(initial_balance)
+        self.balance = Decimal(balance)
 
     def get_balance(self) -> float:
         """
@@ -41,8 +41,8 @@ class Account:
         return True
 
     def __str__(self):
-        return f"Account number: {self.account_number}, Balance: {self.balance}"
+        return f"Account({self.account_number}, balance={self.balance})"
 
     def __repr__(self):
-        return f"Account({self.account_number}, {self.balance})"
+        return f"Account({self.account_number}, balance={self.balance})"
 

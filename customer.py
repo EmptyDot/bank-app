@@ -32,3 +32,8 @@ class Customer:
             and self.password == other.password \
             and self.accounts == other.accounts
 
+    def __str__(self):
+        return f"Customer({self.name}, {self.password}, accounts={self.accounts})"
+
+    def __repr__(self):
+        return f"Customer({self.name}, {self.password})"
