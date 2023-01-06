@@ -1,12 +1,12 @@
 from bank import Bank
-from mock_bank import MockBank
+
 from customer import Customer
 from account import Account
 
 class TestBank:
     def test_get_customers(self):
         customers = [Customer("Bob", "123"), Customer("Alice", "456")]
-        bank = MockBank(customers)
+        bank = Bank(customers)
         assert bank.get_customers() == customers
 
     def test_add_customer(self):
@@ -26,7 +26,7 @@ class TestBank:
         assert bank.customers[-1] == c
 
     def test_get_customer(self):
-        bank = MockBank([Customer("Bob", "123"), Customer("Alice", "456")])
+        bank = Bank([Customer("Bob", "123"), Customer("Alice", "456")])
         c = bank.get_customer("Bob")
         bob = Customer("Bob", "123")
         assert c is not None
@@ -37,16 +37,16 @@ class TestBank:
         assert bank.get_customer("Bob") is None
 
     def test_change_customer_password(self):
-        bank = MockBank([Customer("Bob", "123"), Customer("Alice", "456")])
+        bank = Bank([Customer("Bob", "123"), Customer("Alice", "456")])
         assert bank.change_customer_password("Bob", "789")
         assert bank.customers[0].password == "789"
 
     def test_change_customer_password_fail(self):
-        bank = MockBank([Customer("Bob", "123")])
+        bank = Bank([Customer("Bob", "123")])
         assert not bank.change_customer_password("Alice", "789")
 
     def test_remove_customer(self):
-        bank = MockBank([Customer("Bob", "123"), Customer("Alice", "456")])
+        bank = Bank([Customer("Bob", "123"), Customer("Alice", "456")])
         bob = bank.customers[0]
         assert bob in bank.customers
         assert bank.remove_customer("Bob")
@@ -54,22 +54,22 @@ class TestBank:
         assert bob not in bank.customers
 
     def test_remove_customer_fail(self):
-        bank = MockBank([Customer("Bob", "123")])
+        bank = Bank([Customer("Bob", "123")])
         assert not bank.remove_customer("Alice")
         assert len(bank.customers) == 1
 
     def test_login(self):
-        bank = MockBank([Customer("Bob", "123")])
+        bank = Bank([Customer("Bob", "123")])
         assert bank.login("Bob", "123")
         assert bank.current_user == Customer("Bob", "123")
 
     def test_login_wrong_password(self):
-        bank = MockBank([Customer("Bob", "123")])
+        bank = Bank([Customer("Bob", "123")])
         assert not bank.login("Bob", "bad_password")
         assert bank.current_user is None
 
     def test_login_wrong_name(self):
-        bank = MockBank([Customer("Bob", "123")])
+        bank = Bank([Customer("Bob", "123")])
         assert not bank.login("Alice", "123")
         assert bank.current_user is None
 
@@ -185,7 +185,6 @@ class TestBank:
         bank.current_user = Customer("Bob", "123")
         bank.current_user.accounts = [Account(1), Account(2)]
         assert not bank.deposit(3, 100)
-
 
     def test_withdraw_int(self):
         bank = Bank()

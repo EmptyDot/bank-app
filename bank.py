@@ -7,8 +7,8 @@ from customer import Customer
 
 
 class Bank:
-    def __init__(self):
-        self.customers: list[Customer] = []
+    def __init__(self, customers: Optional[list[Customer]] = None):
+        self.customers: list[Customer] = customers if customers is not None else list()
         self.current_user: Optional[Customer] = None
 
     def get_customers(self) -> list[Customer]:
