@@ -63,12 +63,8 @@ class Bank:
         :return: True if successful else False
         """
         if customer := self.get_customer(name):
-            try:
-                self.customers.remove(customer)
-                return True
-            except ValueError:
-                pass
-
+            self.customers.remove(customer)
+            return True
         return False
 
     def login(self, name: str, password: str) -> bool:
@@ -124,12 +120,8 @@ class Bank:
         :return: True if successful else False
         """
         if account := self.get_account(account_number):
-            try:
-                self.current_user.accounts.remove(account)
-                return True
-            except ValueError:
-                pass
-
+            self.current_user.accounts.remove(account)
+            return True
         return False
 
     def get_account(self, account_number: int) -> Account | None:
