@@ -51,3 +51,13 @@ class TestCustomer:
     def test___eq__wrong_type(self):
         bob = Customer("Bob", "123")
         assert bob != "bob"
+
+    def test___str__(self):
+        c = Customer("Bob", "123")
+        c.add_account(Account(1, 0))
+        assert str(c) == f"Customer(bob, 123, accounts={[Account(1, 0)]})"
+
+    def test___repr__(self):
+        c = Customer("Bob", "123")
+        c.add_account(Account(1, 0))
+        assert repr(c) == f"Customer(bob, 123)"

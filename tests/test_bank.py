@@ -221,3 +221,21 @@ class TestBank:
         bank.current_user = Customer("Bob", "123")
         bank.current_user.accounts = [Account(1)]
         assert not bank.withdraw(3, 100)
+
+    def test___str__(self):
+        bank = Bank([Customer("Bob", "123"), Customer("Alice", "456")])
+        assert str(bank) == f'Bank({[Customer("Bob", "123"), Customer("Alice", "456")]}, current_user=None)'
+
+    def test___str__logged_in(self):
+        bank = Bank([Customer("Bob", "123")])
+        bank.current_user = Customer("Bob", "123")
+        assert str(bank) == f'Bank({[Customer("Bob", "123")]}, current_user={Customer("Bob", "123")})'
+
+    def test___repr__(self):
+        bank = Bank([Customer("Bob", "123"), Customer("Alice", "456")])
+        assert repr(bank) == f'Bank({[Customer("Bob", "123"), Customer("Alice", "456")]}, current_user=None)'
+
+    def test___repr__logged_in(self):
+        bank = Bank([Customer("Bob", "123")])
+        bank.current_user = Customer("Bob", "123")
+        assert repr(bank) == f'Bank({[Customer("Bob", "123")]}, current_user={Customer("Bob", "123")})'
