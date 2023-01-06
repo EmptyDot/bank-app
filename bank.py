@@ -64,6 +64,8 @@ class Bank:
         """
         if customer := self.get_customer(name):
             self.customers.remove(customer)
+            if self.current_user == customer:
+                self.logout()
             return True
         return False
 

@@ -58,6 +58,17 @@ class TestBank:
         assert not bank.remove_customer("Alice")
         assert len(bank.customers) == 1
 
+    def test_remove_customer_logged_in(self):
+        bank = Bank([Customer("Bob", "123"), Customer("Alice", "456")])
+        bob = bank.customers[0]
+        bank.current_user = bob
+        assert bob in bank.customers
+        assert bank.remove_customer("Bob")
+        assert len(bank.customers) == 1
+        assert bob not in bank.customers
+        assert bank.current_user is None
+
+
     def test_login(self):
         bank = Bank([Customer("Bob", "123")])
         assert bank.login("Bob", "123")
