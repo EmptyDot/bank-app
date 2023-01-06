@@ -3,6 +3,19 @@ from customer import Customer
 
 
 class TestCustomer:
+
+    def test_check_name_same(self):
+        c = Customer("Bob", "123")
+        assert c.check_name("Bob")
+
+    def test_check_name_diff_capitalization(self):
+        c = Customer("Bob", "123")
+        assert c.check_name("BOB")
+
+    def test_check_name_wrong_name(self):
+        c = Customer("Bob", "123")
+        assert not c.check_name("Alice")
+
     def test_check_password_correct_password(self):
         password = "123456789"
         c = Customer("Bob", password)

@@ -26,7 +26,7 @@ class Bank:
         :return: True if successful else False
         """
 
-        if all(customer.name != name for customer in self.customers):
+        if all(not customer.check_name(name) for customer in self.customers):
             customer = Customer(name, password)
             self.customers.append(customer)
             return True
@@ -40,7 +40,7 @@ class Bank:
         :return: The customer matching the name
         """
         for customer in self.customers:
-            if customer.name == name:
+            if customer.check_name(name):
                 return customer
 
     def change_customer_password(self, name: str, new_password: str) -> bool:

@@ -3,9 +3,18 @@ from account import Account
 
 class Customer:
     def __init__(self, name: str, password: str):
-        self.name = name
+        self.name = name.lower()
         self.password = password
         self.accounts: list[Account] = []
+
+    def check_name(self, other_name: str) -> bool:
+        """
+          Check if customer password matches another name (case-insensitive)
+          :param other_name: The name to be checked
+          :return: True if equal else False
+          """
+
+        return self.name == other_name.lower()
 
     def check_password(self, other_password: str) -> bool:
         """
