@@ -155,21 +155,21 @@ class TestBank:
         bank.current_user = Customer("Bob", "123")
         bank.current_user.accounts = [Account(1)]
         assert bank.deposit(1, 100)
-        assert bank.current_user.accounts[0].get_balance() == 100
+        assert bank.current_user.accounts[0].balance == 100
 
     def test_deposit_float(self):
         bank = Bank()
         bank.current_user = Customer("Bob", "123")
         bank.current_user.accounts = [Account(1)]
         assert bank.deposit(1, 1.23456789)
-        assert bank.current_user.accounts[0].get_balance() == 1.23
+        assert bank.current_user.accounts[0].balance == 1.23
 
     def test_deposit_negative(self):
         bank = Bank()
         bank.current_user = Customer("Bob", "123")
         bank.current_user.accounts = [Account(1, 100)]
         assert not bank.deposit(1, -100)
-        assert bank.current_user.accounts[0].get_balance() == 100
+        assert bank.current_user.accounts[0].balance == 100
 
     def test_deposit_negative_no_user(self):
         bank = Bank()
@@ -191,21 +191,21 @@ class TestBank:
         bank.current_user = Customer("Bob", "123")
         bank.current_user.accounts = [Account(1, 100)]
         assert bank.withdraw(1, 1)
-        assert bank.current_user.accounts[0].get_balance() == 99
+        assert bank.current_user.accounts[0].balance == 99
 
     def test_withdraw_float(self):
         bank = Bank()
         bank.current_user = Customer("Bob", "123")
         bank.current_user.accounts = [Account(1, 100)]
         assert bank.withdraw(1, 0.1)
-        assert bank.current_user.accounts[0].get_balance() == 99.9
+        assert bank.current_user.accounts[0].balance == 99.9
 
     def test_withdraw_negative(self):
         bank = Bank()
         bank.current_user = Customer("Bob", "123")
         bank.current_user.accounts = [Account(1, 100)]
         assert not bank.withdraw(1, -100)
-        assert bank.current_user.accounts[0].balance == 100
+        assert bank.current_user.accounts[0]._balance == 100
 
     def test_withdraw_negative_no_user(self):
         bank = Bank()
