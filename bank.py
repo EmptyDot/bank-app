@@ -1,15 +1,34 @@
 from __future__ import annotations
 
 from typing import Optional
+import atexit
 
 from account import Account
 from customer import Customer
+from parsing.parser import CustomerParser
+from parsing.parser_json import CustomerParserJson
 
 
 class Bank:
-    def __init__(self, customers: Optional[list[Customer]] = None):
-        self.customers: list[Customer] = customers if customers is not None else list()
+    def __init__(
+        self, save_on_exit: bool = True, parser: CustomerParser = CustomerParserJson()
+    ):
+        self.customers: list[Customer] = []
         self.current_user: Optional[Customer] = None
+        self._parser = parser
+
+        if save_on_exit:
+            atexit.register(self._parser.save_customers, self.customers)
+
+    def load_customers(self) -> bool:
+        """
+        Load the saved customers
+        :return: True if successful else False
+        """
+        if customers := self._parser.load_customers():
+            self.customers.extend(customers)
+            return True
+        return False
 
     def get_customers(self) -> list[Customer]:
         """
