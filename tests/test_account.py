@@ -70,8 +70,8 @@ class TestAccount:
 
     def test___str__(self):
         acc = Account(123, 1)
-        assert str(acc) == "Account(123, balance=1)"
+        assert str(acc) == "Account(123, balance=1.0)"
 
     def test___repr__(self):
         acc = Account(123, 1)
-        assert repr(acc) == "Account(123, balance=1)"
+        assert repr(acc) == "Account(123, balance=1.0)"
