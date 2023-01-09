@@ -4,11 +4,15 @@ import json
 
 from account import Account
 from customer import Customer
-from parsing.parser import CustomerParser
+from parsing.parser import CustomerParser, AccountArgs
 
 
 class CustomerParserJson(CustomerParser):
     def load_customers(self) -> list[Customer] | None:
+        """
+        Load saved customers from the previous instance
+        :return: The list of Customers that was loaded
+        """
         customers = []
         try:
             with open("saved_customers.json", "r") as f:
@@ -22,13 +26,21 @@ class CustomerParserJson(CustomerParser):
             return
 
     @staticmethod
-    def create_customer(name, password, accounts) -> Customer:
+    def create_customer(
+        name: str, password: str, accounts: list[AccountArgs]
+    ) -> Customer:
         customer = Customer(name, password)
-        for account in accounts:
-            customer.add_account(Account(**account))
+        if accounts:
+            for account_args in accounts:
+                customer.add_account(Account(**account_args))
         return customer
 
     def save_customers(self, customers: list[Customer]) -> bool:
+        """
+        Save a list of customers
+        :param customers: The list of customers to be saved
+        :return: True if successful else False
+        """
         try:
             with open("saved_customers.json", "w") as f:
 
@@ -41,7 +53,12 @@ class CustomerParserJson(CustomerParser):
             return False
 
     @staticmethod
-    def serialize_customer(customer: Customer):
+    def serialize_customer(customer: Customer) -> dict:
+        """
+        Turn a Customer object into a dict to be turned into json
+        :param customer: Customer to be serialized
+        :return: A dict containing the information about the cutomer
+        """
         return {
             "name": customer.name,
             "password": customer.password,
@@ -50,4 +67,3 @@ class CustomerParserJson(CustomerParser):
                 for a in customer.accounts
             ],
         }
-
