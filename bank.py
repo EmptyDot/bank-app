@@ -8,6 +8,8 @@ from customer import Customer
 from parsing.parser import CustomerParser
 from parsing.parser_json import CustomerParserJson
 
+BANNED_CHARS = "#/"
+
 
 class Bank:
     def __init__(
@@ -45,7 +47,14 @@ class Bank:
         :return: True if successful else False
         """
 
-        if all(not customer.check_name(name) for customer in self.customers):
+        if all(
+            not customer.check_name(name) for customer in self.customers
+        ) and not any(
+            banned_char in arg
+            for banned_char in BANNED_CHARS
+            for arg in (name, password)
+        ):
+
             customer = Customer(name, password)
             self.customers.append(customer)
             return True
