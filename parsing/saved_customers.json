@@ -1,1 +1,0 @@
-[{"name": "bob", "password": "123", "accounts": [{"account_number": 1, "balance": 10.0}, {"account_number": 2, "balance": 35.3}]}, {"name": "alice", "password": "456", "accounts": [{"account_number": 3, "balance": 587576.0}, {"account_number": 5, "balance": 195.51}]}]

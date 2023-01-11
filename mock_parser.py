@@ -1,6 +1,6 @@
 from account import Account
 from customer import Customer
-from parsing.parser import CustomerParser
+from customer_parser import CustomerParser
 
 
 class MockParser(CustomerParser):
@@ -15,4 +15,5 @@ class MockParser(CustomerParser):
         return customers
 
     def save_customers(self, customers: list[Customer]) -> bool:
-        return True
+        return bool(customers)
+

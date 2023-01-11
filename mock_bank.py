@@ -2,7 +2,7 @@ from typing import Optional
 
 from bank import Bank
 from customer import Customer
-from parsing.mock_parser import MockParser
+from mock_parser import MockParser
 
 
 class MockBank(Bank):

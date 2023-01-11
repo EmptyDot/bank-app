@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Union
+
 
 from customer import Customer
 
-AccountArgs = dict[str, Union[int, float]]
+
 
 
 class CustomerParser(ABC):
