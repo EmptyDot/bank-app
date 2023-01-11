@@ -1,0 +1,30 @@
+[
+  {
+    "name": "bob",
+    "password": "123",
+    "accounts": [
+      {
+        "account_number": 1,
+        "balance": 200.0
+      },
+      {
+        "account_number": 2,
+        "balance": 41515.24
+      }
+    ]
+  },
+  {
+    "name": "alice",
+    "password": "123",
+    "accounts": [
+      {
+        "account_number": 3,
+        "balance": 300.0
+      },
+      {
+        "account_number": 4,
+        "balance": 1.22
+      }
+    ]
+  }
+]

@@ -218,7 +218,7 @@ class TestBank:
         bank.current_user = Customer("Bob", "123")
         bank.current_user.accounts = [Account(1, 100)]
         assert not bank.withdraw(1, -100)
-        assert bank.current_user.accounts[0]._balance == 100
+        assert bank.current_user.accounts[0].balance == 100
 
     def test_withdraw_negative_no_user(self):
         bank = Bank()
