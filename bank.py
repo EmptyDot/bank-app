@@ -5,10 +5,9 @@ import atexit
 
 from account import Account
 from customer import Customer
-from parsing.parser import CustomerParser
-from parsing.parser_json import CustomerParserJson
+from customer_parser import CustomerParser
+from parser_json import CustomerParserJson
 
-BANNED_CHARS = "#/"
 
 
 class Bank:
@@ -47,14 +46,7 @@ class Bank:
         :return: True if successful else False
         """
 
-        if all(
-            not customer.check_name(name) for customer in self.customers
-        ) and not any(
-            banned_char in arg
-            for banned_char in BANNED_CHARS
-            for arg in (name, password)
-        ):
-
+        if all(not customer.check_name(name) for customer in self.customers):
             customer = Customer(name, password)
             self.customers.append(customer)
             return True
