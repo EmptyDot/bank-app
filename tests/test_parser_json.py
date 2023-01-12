@@ -26,7 +26,7 @@ class TestCustomerParserJson:
         assert CustomerParserJson().load_customers("tests/data/empty.json") is None
 
     def test_load_customers_os_error(self):
-        assert False
+        assert CustomerParserJson().load_customers("tests/data/test_isdir") is None
 
     def test_create_customer(self):
         name, password = "Bob", "123"
@@ -54,7 +54,9 @@ class TestCustomerParserJson:
         assert CustomerParserJson().save_customers([Customer("Bob", "123")])
 
     def test_save_customers_os_error(self):
-        assert False
+        customers = get_customer_list()
+        assert CustomerParserJson().save_customers(customers, "tests/data/test_isdir") is False
+
     def test_serialize_customer(self):
         customer_dict = {
             "name": "bob",

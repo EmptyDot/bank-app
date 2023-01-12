@@ -15,8 +15,7 @@ AccountArgs = dict[str, Union[int, float]]
 
 DEFAULT_FILE_PATH = "data/saved_customers.json"
 
-logger = get_logger(__name__, logging_level=logging.INFO)
-
+logger = get_logger()
 
 class CustomerParserJson(CustomerParser):
     """
@@ -33,7 +32,7 @@ class CustomerParserJson(CustomerParser):
         """
 
         try:
-            with open(file_path, "r") as file:
+            with open(file_path, "r", encoding="utf-8") as file:
                 json_str = file.read()
                 customers_json = json.loads(json_str)
                 customers = []
@@ -44,8 +43,8 @@ class CustomerParserJson(CustomerParser):
 
         except FileNotFoundError:
             logger.error(log_message("FileNotFoundError"))
-        except OSError as e:
-            logger.error(log_message(e.__class__.__name__))
+        except OSError as exc:
+            logger.error(log_message(exc.__class__.__name__))
         except JSONDecodeError:
             logger.error(log_message("JSONDecodeError"))
 
@@ -75,7 +74,7 @@ class CustomerParserJson(CustomerParser):
             return False
 
         try:
-            with open(file_path, "w") as file:
+            with open(file_path, "w", encoding="utf-8") as file:
 
                 json_str = json.dumps(
                     [self.serialize_customer(customer) for customer in customers],
@@ -83,8 +82,10 @@ class CustomerParserJson(CustomerParser):
                 )
                 file.write(json_str)
                 return True
-        except OSError as e:
-            logger.error(log_message(e.__class__.__name__))
+        except OSError as exc:
+            logger.error(log_message(exc.__class__.__name__))
+
+        return False
 
     @staticmethod
     def serialize_customer(customer: Customer) -> dict:
