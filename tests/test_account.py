@@ -57,7 +57,7 @@ class TestAccount:
 
     def test_balance_sub_withdraw_all(self):
         acc = Account(123, 1)
-        assert acc.balance_sub(1) is True
+        assert acc.balance_sub(1)
         assert acc.balance == 0
 
     def test___str__(self):

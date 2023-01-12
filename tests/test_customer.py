@@ -3,7 +3,6 @@ from customer import Customer
 
 
 class TestCustomer:
-
     def test_check_name_same(self):
         c = Customer("Bob", "123")
         assert c.check_name("Bob")
@@ -14,7 +13,7 @@ class TestCustomer:
 
     def test_check_name_wrong_name(self):
         c = Customer("Bob", "123")
-        assert not c.check_name("Alice")
+        assert c.check_name("Alice") is False
 
     def test_check_password_correct_password(self):
         password = "123456789"
