@@ -1,15 +1,13 @@
 from __future__ import annotations
 
 import json
-import logging
 from json import JSONDecodeError
-from typing import Union
+from typing import Union, Optional
 
 from account import Account
 from customer import Customer
-from logger import get_logger, log_message
 from customer_parser import CustomerParser
-
+from logger import get_logger, log_message
 
 AccountArgs = dict[str, Union[int, float]]
 
@@ -17,13 +15,14 @@ DEFAULT_FILE_PATH = "data/saved_customers.json"
 
 logger = get_logger()
 
+
 class CustomerParserJson(CustomerParser):
     """
     Class used for data persistence
     """
 
     def load_customers(
-        self, file_path: str = DEFAULT_FILE_PATH
+        self, file_path: Optional[str] = DEFAULT_FILE_PATH
     ) -> list[Customer] | None:
         """
         Load saved customers from the previous instance
@@ -62,7 +61,7 @@ class CustomerParserJson(CustomerParser):
         return customer
 
     def save_customers(
-        self, customers: list[Customer], file_path: str = DEFAULT_FILE_PATH
+        self, customers: list[Customer], file_path: Optional[str] = DEFAULT_FILE_PATH
     ) -> bool:
         """
         Save a list of customers

@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-from typing import Optional
 import atexit
+from typing import Optional
 
 from account import Account
 from customer import Customer
 from customer_parser import CustomerParser
 from parser_json import CustomerParserJson
-
 
 
 class Bank:
@@ -21,14 +20,20 @@ class Bank:
         if save_on_exit:
             atexit.register(self.__parser.save_customers, self.customers)
 
-    def load_customers(self) -> bool:
+    def load_customers(self, file_path: Optional[str] = "") -> bool:
         """
         Load the saved customers
+        :param file_path: Path to the file to load from
         :return: True if successful else False
         """
-        if customers := self.__parser.load_customers():
-            self.customers.extend(customers)
-            return True
+        if file_path:
+            if customers := self.__parser.load_customers(file_path):
+                self.customers.extend(customers)
+                return True
+        else:
+            if customers := self.__parser.load_customers():
+                self.customers.extend(customers)
+                return True
         return False
 
     def get_customers(self) -> list[Customer]:
@@ -46,8 +51,11 @@ class Bank:
         :return: True if successful else False
         """
 
-        if all(not customer.check_name(name) for customer in self.customers)\
-                and isinstance(name, str) and isinstance(password, str):
+        if (
+            all(not customer.check_name(name) for customer in self.customers)
+            and isinstance(name, str)
+            and isinstance(password, str)
+        ):
 
             customer = Customer(name, password)
             self.customers.append(customer)
