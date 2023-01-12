@@ -16,17 +16,17 @@ class Bank:
     ):
         self.customers: list[Customer] = []
         self.current_user: Optional[Customer] = None
-        self._parser = parser
+        self.__parser = parser
 
         if save_on_exit:
-            atexit.register(self._parser.save_customers, self.customers)
+            atexit.register(self.__parser.save_customers, self.customers)
 
     def load_customers(self) -> bool:
         """
         Load the saved customers
         :return: True if successful else False
         """
-        if customers := self._parser.load_customers():
+        if customers := self.__parser.load_customers():
             self.customers.extend(customers)
             return True
         return False
@@ -42,11 +42,13 @@ class Bank:
         """
         Add a new customer
         :param name: Username of the customer. Should be unique.
-        :param password: Password of the customer.
+        :param password: Password of the customer
         :return: True if successful else False
         """
 
-        if all(not customer.check_name(name) for customer in self.customers):
+        if all(not customer.check_name(name) for customer in self.customers)\
+                and isinstance(name, str) and isinstance(password, str):
+
             customer = Customer(name, password)
             self.customers.append(customer)
             return True
@@ -130,7 +132,7 @@ class Bank:
             if all(
                 user_account.account_number != account_number
                 for user_account in self.current_user.accounts
-            ):
+            ) and isinstance(account_number, int):
                 acc = Account(account_number)
                 return self.current_user.add_account(acc)
         return False
@@ -164,8 +166,9 @@ class Bank:
         :param amount: The amount to be added.
         :return: True if successful else False
         """
-        if account := self.get_account(account_number):
-            return account.balance_add(amount)
+        if isinstance(amount, (int, float)):
+            if account := self.get_account(account_number):
+                return account.balance_add(amount)
 
         return False
 
@@ -176,8 +179,9 @@ class Bank:
         :param amount: The amount to be subtracted.
         :return: True if successful else False
         """
-        if account := self.get_account(account_number):
-            return account.balance_sub(amount)
+        if isinstance(amount, (int, float)):
+            if account := self.get_account(account_number):
+                return account.balance_sub(amount)
 
         return False
 

@@ -23,7 +23,7 @@ class Account:
         :param amount: Amount to be added
         :return: True if successful else False
         """
-        if not isinstance(amount, (int, float)) or amount <= 0:
+        if amount <= 0:
             return False
 
         self.__balance = self.__balance + Decimal(amount)
@@ -35,7 +35,7 @@ class Account:
         :param amount: Amount to be subtracted
         :return: True if successful else False
         """
-        if not isinstance(amount, (int, float)) or amount <= 0 or amount > self.__balance:
+        if amount <= 0 or amount > self.__balance:
             return False
 
         self.__balance = self.__balance - Decimal(amount)

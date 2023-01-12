@@ -34,10 +34,6 @@ class TestAccount:
         assert acc.balance_add(-1) is False
         assert acc.balance == amount
 
-    def test_balance_add_wrong_type(self):
-        acc = Account(123, 1)
-        assert acc.balance_add("one") is False
-
     def test_balance_sub_int(self):
         acc = Account(123, 2)
         acc.balance_sub(1)
@@ -53,10 +49,6 @@ class TestAccount:
         acc = Account(123, amount)
         assert acc.balance_sub(-1) is False
         assert acc.balance == amount
-
-    def test_balance_sub_wrong_type(self):
-        acc = Account(123, 1)
-        assert acc.balance_sub("one") is False
 
     def test_balance_sub_withdraw_more_then_balance(self):
         acc = Account(123, 1)

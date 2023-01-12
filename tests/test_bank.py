@@ -27,6 +27,12 @@ class TestBank:
         assert len(bank.customers) == 1
         assert bank.customers[-1] == c
 
+    def test_add_customer_wrong_type(self):
+        bank = Bank()
+        name, password = ["bob"], 123
+        assert bank.add_customer(name, password) is False
+        assert len(bank.customers) == 0
+
     def test_get_customer(self):
         bank = MockBank([Customer("Bob", "123"), Customer("Alice", "456")])
         c = bank.get_customer("Bob")
@@ -123,6 +129,12 @@ class TestBank:
         assert not bank.add_account(1)
         assert len(bank.current_user.accounts) == 1
 
+    def test_add_account_wrong_type(self):
+        bank = Bank()
+        bank.current_user = Customer("Bob", "123")
+        assert bank.add_account("1101000") is False
+        assert len(bank.current_user.accounts) == 0
+
     def test_remove_account(self):
         bank = Bank()
         bank.current_user = Customer("Bob", "123")
@@ -184,9 +196,16 @@ class TestBank:
         assert not bank.deposit(1, -100)
         assert bank.current_user.accounts[0].balance == 100
 
-    def test_deposit_negative_no_user(self):
+    def test_deposit_no_user(self):
         bank = Bank()
         assert not bank.deposit(1, 100)
+
+    def test_deposit_wrong_type(self):
+        bank = Bank()
+        bank.current_user = Customer("Bob", "123")
+        bank.current_user.accounts = [Account(1)]
+        assert bank.deposit(1, "100") is False
+        assert bank.current_user.accounts[0].balance == 0
 
     def test_deposit_no_accounts(self):
         bank = Bank()
@@ -234,6 +253,13 @@ class TestBank:
         bank.current_user = Customer("Bob", "123")
         bank.current_user.accounts = [Account(1)]
         assert not bank.withdraw(3, 100)
+
+    def test_withdraw_wrong_type(self):
+        bank = Bank()
+        bank.current_user = Customer("Bob", "123")
+        bank.current_user.accounts = [Account(1, 100)]
+        assert bank.withdraw(1, "1") is False
+        assert bank.current_user.accounts[0].balance == 100
 
     def test___str__(self):
         bank = MockBank([Customer("Bob", "123"), Customer("Alice", "456")])
