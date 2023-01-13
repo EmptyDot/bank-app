@@ -1,3 +1,4 @@
+import logger
 from account import Account
 
 
@@ -9,10 +10,10 @@ class Customer:
 
     def check_name(self, other_name: str) -> bool:
         """
-          Check if customer password matches another name (case-insensitive)
-          :param other_name: The name to be checked
-          :return: True if equal else False
-          """
+        Check if customer password matches another name (case-insensitive)
+        :param other_name: The name to be checked
+        :return: True if equal else False
+        """
 
         return self.name == other_name.lower()
 
@@ -33,13 +34,18 @@ class Customer:
         if isinstance(account, Account):
             self.accounts.append(account)
             return True
+        logger.log_exception(
+            TypeError(f"Expected type Account, got {type(account)}")
+        )
         return False
 
     def __eq__(self, other):
-        return isinstance(other, Customer) \
-            and self.name == other.name \
-            and self.password == other.password \
+        return (
+            isinstance(other, Customer)
+            and self.name == other.name
+            and self.password == other.password
             and self.accounts == other.accounts
+        )
 
     def __str__(self):
         return f"Customer({self.name}, {self.password}, accounts={self.accounts})"

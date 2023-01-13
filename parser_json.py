@@ -1,19 +1,18 @@
 from __future__ import annotations
 
 import json
+import logging
 from json import JSONDecodeError
 from typing import Union, Optional
 
+import logger
 from account import Account
 from customer import Customer
 from customer_parser import CustomerParser
-from logger import get_logger, log_message
 
 AccountArgs = dict[str, Union[int, float]]
 
 DEFAULT_FILE_PATH = "data/saved_customers.json"
-
-logger = get_logger()
 
 
 class CustomerParserJson(CustomerParser):
@@ -29,7 +28,7 @@ class CustomerParserJson(CustomerParser):
         :param file_path: Path to file to load from
         :return: The list of Customers that was loaded
         """
-
+        logger.log_message(f"Loading files from {file_path}", logging.INFO)
         try:
             with open(file_path, "r", encoding="utf-8") as file:
                 json_str = file.read()
@@ -40,12 +39,12 @@ class CustomerParserJson(CustomerParser):
 
                 return customers
 
-        except FileNotFoundError:
-            logger.error(log_message("FileNotFoundError"))
-        except OSError as exc:
-            logger.error(log_message(exc.__class__.__name__))
-        except JSONDecodeError:
-            logger.error(log_message("JSONDecodeError"))
+        except FileNotFoundError as e:
+            logger.log_exception(e)
+        except OSError as e:
+            logger.log_exception(e)
+        except JSONDecodeError as e:
+            logger.log_exception(e)
 
     @staticmethod
     def create_customer(
@@ -71,7 +70,7 @@ class CustomerParserJson(CustomerParser):
         """
         if not customers:
             return False
-
+        logger.log_message(f"Saving customers to {file_path}", logging.INFO)
         try:
             with open(file_path, "w", encoding="utf-8") as file:
 
@@ -81,8 +80,8 @@ class CustomerParserJson(CustomerParser):
                 )
                 file.write(json_str)
                 return True
-        except OSError as exc:
-            logger.error(log_message(exc.__class__.__name__))
+        except OSError as e:
+            logger.log_message(f"{type(e).__name__}: {e}", logging.ERROR)
 
         return False
 

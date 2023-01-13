@@ -1,5 +1,9 @@
 from __future__ import annotations
+
+import logging
 from decimal import Decimal, getcontext
+
+import logger
 
 getcontext()
 
@@ -24,6 +28,7 @@ class Account:
         :return: True if successful else False
         """
         if amount <= 0:
+            logger.log_message(f"Amount: {amount} <= 0", logging.WARNING)
             return False
 
         self.__balance = self.__balance + Decimal(amount)
@@ -35,19 +40,24 @@ class Account:
         :param amount: Amount to be subtracted
         :return: True if successful else False
         """
-        if amount <= 0 or amount > self.__balance:
+        if amount <= 0:
+            logger.log_message(f"Amount: {amount} <= 0", logging.WARNING)
+            return False
+        if amount > self.__balance:
+            logger.log_message(f"Amount: {amount} > {self.balance}", logging.WARNING)
             return False
 
         self.__balance = self.__balance - Decimal(amount)
         return True
 
     def __eq__(self, other_account: Account):
-        return self.account_number == other_account.account_number \
+        return (
+            self.account_number == other_account.account_number
             and self.balance == other_account.balance
+        )
 
     def __str__(self):
         return f"Account({self.account_number}, balance={self.balance})"
 
     def __repr__(self):
         return f"Account({self.account_number}, balance={self.balance})"
-

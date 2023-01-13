@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import atexit
+import logging
 from typing import Optional
 
+import logger
 from account import Account
 from customer import Customer
 from customer_parser import CustomerParser
@@ -34,6 +36,7 @@ class Bank:
             if customers := self.__parser.load_customers():
                 self.customers.extend(customers)
                 return True
+        logger.log_message(f"Failed to load customers", logging.CRITICAL)
         return False
 
     def get_customers(self) -> list[Customer]:
@@ -51,17 +54,23 @@ class Bank:
         :return: True if successful else False
         """
 
-        if (
-            all(not customer.check_name(name) for customer in self.customers)
-            and isinstance(name, str)
-            and isinstance(password, str)
-        ):
+        if any(customer.check_name(name) for customer in self.customers):
+            logger.log_message(
+                f"Customer with name {name} already exists.", logging.WARNING
+            )
+            return False
 
-            customer = Customer(name, password)
-            self.customers.append(customer)
-            return True
+        if not isinstance(name, str) or not isinstance(password, str):
+            logger.log_exception(
+                TypeError(
+                    f"Expected type (str, str), got ({type(name)}, {type(password)})"
+                )
+            )
+            return False
 
-        return False
+        customer = Customer(name, password)
+        self.customers.append(customer)
+        return True
 
     def get_customer(self, name: str) -> Customer | None:
         """
@@ -72,6 +81,7 @@ class Bank:
         for customer in self.customers:
             if customer.check_name(name):
                 return customer
+        logger.log_message(f"Customer of name {name} not found.", logging.WARNING)
 
     def change_customer_password(self, name: str, new_password: str) -> bool:
         """
@@ -110,6 +120,7 @@ class Bank:
             if customer.check_password(password):
                 self.current_user = customer
                 return True
+            logger.log_message("Incorrect password", logging.WARNING)
         return False
 
     def logout(self) -> bool:
@@ -117,18 +128,23 @@ class Bank:
         Log out the currently logged in customer
         :return: True if successful else False
         """
-        if self.current_user:
-            self.current_user = None
-            return True
-        return False
+        if not self.current_user:
+            logger.log_message("No customer is logged in", logging.WARNING)
+            return False
+
+        self.current_user = None
+        return True
 
     def get_accounts(self) -> list[Account] | None:
         """
         Get all accounts that belong to the currently logged in customer
         :return: The list of accounts
         """
-        if self.current_user:
-            return self.current_user.accounts
+        if not self.current_user:
+            logger.log_message("No customer is logged in", logging.WARNING)
+            return
+
+        return self.current_user.accounts
 
     def add_account(self, account_number: int) -> bool:
         """
@@ -136,14 +152,28 @@ class Bank:
         :param account_number: Account number of the new account.
         :return: True if successful else False
         """
-        if self.current_user:
-            if all(
-                user_account.account_number != account_number
-                for user_account in self.current_user.accounts
-            ) and isinstance(account_number, int):
-                acc = Account(account_number)
-                return self.current_user.add_account(acc)
-        return False
+        if not self.current_user:
+            logger.log_message("No customer is logged in", logging.WARNING)
+            return False
+
+        if any(
+            user_account.account_number == account_number
+            for user_account in self.current_user.accounts
+        ):
+            logger.log_message(
+                f"Customer has no account with account number {account_number}",
+                logging.WARNING,
+            )
+            return False
+
+        if not isinstance(account_number, int):
+            logger.log_exception(
+                TypeError(f"Expected type int, got {type(account_number)}")
+            )
+            return False
+
+        acc = Account(account_number)
+        return self.current_user.add_account(acc)
 
     def remove_account(self, account_number: int) -> bool:
         """
@@ -166,6 +196,10 @@ class Bank:
             for account in accounts:
                 if account.account_number == account_number:
                     return account
+            logger.log_message(
+                f"Account with account number {account_number} not found.",
+                logging.WARNING,
+            )
 
     def deposit(self, account_number: int, amount: int | float) -> bool:
         """
@@ -174,9 +208,14 @@ class Bank:
         :param amount: The amount to be added.
         :return: True if successful else False
         """
-        if isinstance(amount, (int, float)):
-            if account := self.get_account(account_number):
-                return account.balance_add(amount)
+        if not isinstance(amount, (int, float)):
+            logger.log_exception(
+                TypeError(f"Expected type (int | float), got {type(amount)}")
+            )
+            return False
+
+        if account := self.get_account(account_number):
+            return account.balance_add(amount)
 
         return False
 
@@ -187,9 +226,14 @@ class Bank:
         :param amount: The amount to be subtracted.
         :return: True if successful else False
         """
-        if isinstance(amount, (int, float)):
-            if account := self.get_account(account_number):
-                return account.balance_sub(amount)
+        if not isinstance(amount, (int, float)):
+            logger.log_exception(
+                TypeError(f"Expected type (int | float), got {type(amount)}")
+            )
+            return False
+
+        if account := self.get_account(account_number):
+            return account.balance_sub(amount)
 
         return False
 

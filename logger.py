@@ -32,7 +32,10 @@ def get_logger(name: str = "bankapp") -> logging.Logger:
     return logger
 
 
-def log_message(message):
+DEFAULT_LOGGER = get_logger()
+
+
+def log_message(message: str, level: int, logger: logging.Logger = DEFAULT_LOGGER):
     stack = inspect.stack()
     calling_frame = stack[1]
     module_name = inspect.getmodule(calling_frame[0]).__name__
@@ -40,4 +43,11 @@ def log_message(message):
     class_name = ""
     if "self" in calling_frame[0].f_locals:
         class_name = calling_frame[0].f_locals["self"].__class__.__name__
-    return f"{module_name}.{class_name + '.' if class_name else ''}{function_name}: {message}"
+    logger.log(
+        level=level,
+        msg=f"{module_name}.{class_name + '.' if class_name else ''}{function_name}: {message}",
+    )
+
+
+def log_exception(exc: Exception, logger: logging.Logger = DEFAULT_LOGGER):
+    log_message(f"{type(exc).__name__}: {exc}", logging.ERROR, logger)

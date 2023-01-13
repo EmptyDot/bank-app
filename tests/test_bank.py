@@ -83,7 +83,7 @@ class TestBank:
 
     def test_login_wrong_password(self):
         bank = MockBank([Customer("Bob", "123")], save_on_exit=False)
-        assert not bank.login("Bob", "bad_password")
+        assert bank.login("Bob", "bad_password") is False
         assert bank.current_user is None
 
     def test_login_wrong_name(self):
