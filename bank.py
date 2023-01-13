@@ -237,6 +237,13 @@ class Bank:
 
         return False
 
+    def to_json(self):
+        return {
+            "customers": [customer.to_json() for customer in self.customers],
+            "current_user": self.current_user.to_json() if type(self.current_user) == Customer else ""
+        }
+
+
     def __str__(self):
         return f"Bank({self.get_customers()}, current_user={self.current_user})"
 

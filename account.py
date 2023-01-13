@@ -50,6 +50,12 @@ class Account:
         self.__balance = self.__balance - Decimal(amount)
         return True
 
+    def to_json(self):
+        return {
+            "account_number": self.account_number,
+            "balance": self.balance
+        }
+
     def __eq__(self, other_account: Account):
         return (
             self.account_number == other_account.account_number

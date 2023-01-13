@@ -39,6 +39,13 @@ class Customer:
         )
         return False
 
+    def to_json(self):
+        return {
+            "name": self.name,
+            "password": self.password,
+            "accounts": [account.to_json() for account in self.accounts]
+        }
+
     def __eq__(self, other):
         return (
             isinstance(other, Customer)

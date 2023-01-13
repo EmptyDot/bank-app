@@ -75,7 +75,7 @@ class CustomerParserJson(CustomerParser):
             with open(file_path, "w", encoding="utf-8") as file:
 
                 json_str = json.dumps(
-                    [self.serialize_customer(customer) for customer in customers],
+                    [customer.to_json() for customer in customers],
                     indent=2,
                 )
                 file.write(json_str)
@@ -85,18 +85,3 @@ class CustomerParserJson(CustomerParser):
 
         return False
 
-    @staticmethod
-    def serialize_customer(customer: Customer) -> dict:
-        """
-        Turn a Customer object into a dict to be turned into json
-        :param customer: Customer to be serialized
-        :return: A dict containing the information about the customer
-        """
-        return {
-            "name": customer.name,
-            "password": customer.password,
-            "accounts": [
-                {"account_number": a.account_number, "balance": a.balance}
-                for a in customer.accounts
-            ],
-        }
