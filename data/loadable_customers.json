@@ -1,0 +1,21 @@
+[
+  {
+    "name": "dan",
+    "password": "btGx6Kh?38@3QaMT",
+    "accounts": [
+      {
+        "account_number": 25192847,
+        "balance": 11.11
+      },
+      {
+        "account_number": 23623623,
+        "balance": 5838.32
+      }
+    ]
+  },
+  {
+    "name": "edvin",
+    "password": "$HQn@DmomrE6esbs",
+    "accounts": []
+  }
+]
