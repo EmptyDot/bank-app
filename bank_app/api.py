@@ -59,45 +59,51 @@ def login(name: str, password: str):
         return bank.current_user.to_json()
 
 
-@app.get("bank/logout")
+@app.get("logout")
 def logout():
     if customer := bank.current_user:
         if bank.logout():
             return customer.to_json()
 
 
-@app.get("/bank/accounts")
-def get_accounts():
-    if accounts := bank.get_accounts():
-        return [account.to_json() for account in accounts]
+@app.get("/{name}/accounts")
+def get_accounts(name: str):
+    if name == bank.current_user.name:
+        if accounts := bank.get_accounts():
+            return [account.to_json() for account in accounts]
 
 
-@app.put("/bank/add/{account_number}")
-def add_account(account_number: int):
-    if bank.add_account(account_number):
-        return bank.get_account(account_number).to_json()
+@app.put("/{name}/{account_number}/add")
+def add_account(name: str, account_number: int):
+    if name == bank.current_user.name:
+        if bank.add_account(account_number):
+            return bank.get_account(account_number).to_json()
 
 
-@app.put("/bank/remove/{account_number}")
-def remove_account(account_number: int):
-    if account := bank.get_account(account_number):
-        if bank.remove_account(account_number):
+@app.put("/{name}/{account_number}/remove")
+def remove_account(name: str, account_number: int):
+    if name == bank.current_user.name:
+        if account := bank.get_account(account_number):
+            if bank.remove_account(account_number):
+                return account.to_json()
+
+
+@app.get("/{name}/{account_number}")
+def get_account(name: str, account_number: int):
+    if name == bank.current_user.name:
+        if account := bank.get_account(account_number):
             return account.to_json()
 
 
-@app.get("/bank/account/{account_number}")
-def get_account(account_number: int):
-    if account := bank.get_account(account_number):
-        return account.to_json()
+@app.put("/{name}/{account_number}/deposit/{amount}")
+def deposit(name: str, account_number: int, amount: Union[int, float]):
+    if name == bank.current_user.name:
+        if bank.deposit(account_number, amount):
+            return bank.get_account(account_number).to_json()
 
 
-@app.put("/bank/{account_number}/deposit/{amount}")
-def deposit(account_number: int, amount: Union[int, float]):
-    if bank.deposit(account_number, amount):
-        return bank.get_account(account_number).to_json()
-
-
-@app.put("/bank/{account_number}/withdraw/{amount}")
-def withdraw(account_number: int, amount: Union[int, float]):
-    if bank.withdraw(account_number, amount):
-        return bank.get_account(account_number).to_json()
+@app.put("/{name}/{account_number}/withdraw/{amount}")
+def withdraw(name: str, account_number: int, amount: Union[int, float]):
+    if name == bank.current_user.name:
+        if bank.withdraw(account_number, amount):
+            return bank.get_account(account_number).to_json()
