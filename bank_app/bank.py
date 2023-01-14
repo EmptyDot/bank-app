@@ -157,7 +157,7 @@ class Bank:
             return False
 
         if any(
-            user_account.account_number == account_number
+            user_account.check_account_number(account_number)
             for user_account in self.current_user.accounts
         ):
             logger.log_message(
@@ -194,7 +194,7 @@ class Bank:
         """
         if accounts := self.get_accounts():
             for account in accounts:
-                if account.account_number == account_number:
+                if account.check_account_number(account_number):
                     return account
             logger.log_message(
                 f"Account with account number {account_number} not found.",
@@ -240,9 +240,10 @@ class Bank:
     def to_json(self):
         return {
             "customers": [customer.to_json() for customer in self.customers],
-            "current_user": self.current_user.to_json() if type(self.current_user) == Customer else ""
+            "current_user": self.current_user.to_json()
+            if type(self.current_user) == Customer
+            else "",
         }
-
 
     def __str__(self):
         return f"Bank({self.get_customers()}, current_user={self.current_user})"
