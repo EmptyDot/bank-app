@@ -4,11 +4,11 @@ import atexit
 import logging
 from typing import Optional
 
-import logger
-from account import Account
-from customer import Customer
-from customer_parser import CustomerParser
-from parser_json import CustomerParserJson
+from bank_app import logger
+from .account import Account
+from .customer import Customer
+from .customer_parser import CustomerParser
+from .parser_json import CustomerParserJson
 
 
 class Bank:

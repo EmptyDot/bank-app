@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from decimal import Decimal, getcontext
 
-import logger
+from bank_app import logger
 
 getcontext()
 

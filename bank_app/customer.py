@@ -1,5 +1,5 @@
-import logger
-from account import Account
+from bank_app import logger
+from .account import Account
 
 
 class Customer:

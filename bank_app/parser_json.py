@@ -6,13 +6,13 @@ from json import JSONDecodeError
 from typing import Union, Optional
 
 from bank_app import logger
-from bank_app.account import Account
-from bank_app.customer import Customer
-from customer_parser import CustomerParser
+from .account import Account
+from .customer import Customer
+from .customer_parser import CustomerParser
 
 AccountArgs = dict[str, Union[int, float]]
 
-DEFAULT_FILE_PATH = "../data/saved_customers.json"
+DEFAULT_FILE_PATH = "data/saved_customers.json"
 
 
 class CustomerParserJson(CustomerParser):
