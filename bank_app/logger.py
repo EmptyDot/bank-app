@@ -15,16 +15,16 @@ def get_logger(name: str = "bankapp") -> logging.Logger:
     logger = logging.getLogger(name)
     logger.setLevel(logging.DEBUG)
 
-    if not os.path.isdir("logs"):
-        if os.path.exists("logs"):
+    if not os.path.isdir("../logs"):
+        if os.path.exists("../logs"):
             log_abs_path = os.path.dirname(__file__) + r"\logs"
             raise FileExistsError(
                 f"Can't create a directory, file 'logs' already exists. {log_abs_path}"
             )
-        os.mkdir("logs")
+        os.mkdir("../logs")
 
     file_name = name.replace(".", "_")
-    log_file_path = f"logs/{file_name}.log"
+    log_file_path = f"bank_app/logs/{file_name}.log"
     handler = logging.FileHandler(log_file_path, mode="w")
     formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
     handler.setFormatter(formatter)

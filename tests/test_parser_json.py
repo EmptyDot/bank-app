@@ -1,6 +1,6 @@
-from account import Account
-from customer import Customer
-from parser_json import CustomerParserJson
+from bank_app.account import Account
+from bank_app.customer import Customer
+from bank_app.parser_json import CustomerParserJson
 
 
 def get_customer_list():

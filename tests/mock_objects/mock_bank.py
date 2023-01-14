@@ -1,7 +1,5 @@
-from typing import Optional
-
-from bank import Bank
-from customer import Customer
+from bank_app.bank import Bank
+from bank_app.customer import Customer
 from tests.mock_objects.mock_parser import MockParser
 
 

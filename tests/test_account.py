@@ -1,4 +1,4 @@
-from account import Account
+from bank_app.account import Account
 
 
 class TestAccount:

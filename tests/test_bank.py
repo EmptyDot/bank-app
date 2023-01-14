@@ -1,9 +1,6 @@
-from bank import Bank
-
-from customer import Customer
-from account import Account
+from bank_app.customer import Customer
+from bank_app.account import Account
 from tests.mock_objects.mock_bank import MockBank
-from tests.mock_objects.mock_parser import MockParser
 
 
 def get_bank(customers: list[Customer] = None):
