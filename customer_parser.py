@@ -17,7 +17,9 @@ class CustomerParser(ABC):
         pass
 
     @abstractmethod
-    def save_customers(self, customers: list[Customer], file_path: Optional[str] = "") -> bool:
+    def save_customers(
+        self, customers: list[Customer], file_path: Optional[str] = ""
+    ) -> bool:
         """
         Save a list of customers
         :param customers: The list of customers to be saved
