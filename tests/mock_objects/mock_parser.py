@@ -1,8 +1,8 @@
 from typing import Optional
 
-from account import Account
-from customer import Customer
-from customer_parser import CustomerParser
+from bank_app.account import Account
+from bank_app.customer import Customer
+from bank_app.customer_parser import CustomerParser
 
 
 class MockParser(CustomerParser):

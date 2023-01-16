@@ -5,10 +5,10 @@ import logging
 from json import JSONDecodeError
 from typing import Union, Optional
 
-import logger
-from account import Account
-from customer import Customer
-from customer_parser import CustomerParser
+from bank_app import logger
+from .account import Account
+from .customer import Customer
+from .customer_parser import CustomerParser
 
 AccountArgs = dict[str, Union[int, float]]
 

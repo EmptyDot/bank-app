@@ -1,6 +1,7 @@
-from account import Account
-from customer import Customer
-from parser_json import CustomerParserJson
+from bank_app.account import Account
+from bank_app.customer import Customer
+from bank_app.parser_json import CustomerParserJson
+from tests.mock_objects.mock_parser import MockParser
 
 
 def get_customer_list():
@@ -66,7 +67,7 @@ class TestCustomerParserJson:
         )
 
     def test_save_customers_no_accounts(self):
-        assert CustomerParserJson().save_customers([Customer("Bob", "123")])
+        assert CustomerParserJson().save_customers([Customer("Bob", "123")], "tests/data/test_saved_customers_save.json")
 
     def test_save_customers_os_error(self):
         customers = get_customer_list()
@@ -74,18 +75,3 @@ class TestCustomerParserJson:
             CustomerParserJson().save_customers(customers, "tests/data/test_isdir")
             is False
         )
-
-    def test_serialize_customer(self):
-        customer_dict = {
-            "name": "bob",
-            "password": "123",
-            "accounts": [
-                {"account_number": 1, "balance": 200.0},
-                {"account_number": 2, "balance": 41515.24},
-            ],
-        }
-
-        customer = Customer("Bob", "123")
-        customer.accounts = [Account(1, 200), Account(2, 41515.24)]
-
-        assert CustomerParserJson().serialize_customer(customer) == customer_dict

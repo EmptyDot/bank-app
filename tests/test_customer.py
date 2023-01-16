@@ -1,5 +1,5 @@
-from account import Account
-from customer import Customer
+from bank_app.account import Account
+from bank_app.customer import Customer
 
 
 class TestCustomer:

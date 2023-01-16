@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from decimal import Decimal, getcontext
 
-import logger
+from bank_app import logger
 
 getcontext()
 
@@ -49,6 +49,18 @@ class Account:
 
         self.__balance = self.__balance - Decimal(amount)
         return True
+
+    def check_account_number(self, other_account_number):
+        """
+        Check if account number matches another account number
+        :param other_account_number: The account number to be checked
+        :return: True if equal else False
+        """
+
+        return self.account_number == other_account_number
+
+    def to_json(self):
+        return {"account_number": self.account_number, "balance": self.balance}
 
     def __eq__(self, other_account: Account):
         return (

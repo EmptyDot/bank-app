@@ -1,5 +1,5 @@
-import logger
-from account import Account
+from bank_app import logger
+from .account import Account
 
 
 class Customer:
@@ -34,10 +34,15 @@ class Customer:
         if isinstance(account, Account):
             self.accounts.append(account)
             return True
-        logger.log_exception(
-            TypeError(f"Expected type Account, got {type(account)}")
-        )
+        logger.log_exception(TypeError(f"Expected type Account, got {type(account)}"))
         return False
+
+    def to_json(self):
+        return {
+            "name": self.name,
+            "password": self.password,
+            "accounts": [account.to_json() for account in self.accounts],
+        }
 
     def __eq__(self, other):
         return (

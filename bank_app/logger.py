@@ -24,7 +24,7 @@ def get_logger(name: str = "bankapp") -> logging.Logger:
         os.mkdir("logs")
 
     file_name = name.replace(".", "_")
-    log_file_path = f"logs/{file_name}.log"
+    log_file_path = f"bank_app/logs/{file_name}.log"
     handler = logging.FileHandler(log_file_path, mode="w")
     formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
     handler.setFormatter(formatter)
