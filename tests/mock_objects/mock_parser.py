@@ -16,6 +16,7 @@ class MockParser(CustomerParser):
         customers.append(alice)
         return customers
 
-    def save_customers(self, customers: list[Customer], file_path: Optional[str] = "") -> bool:
+    def save_customers(
+        self, customers: list[Customer], file_path: Optional[str] = ""
+    ) -> bool:
         return bool(customers)
-

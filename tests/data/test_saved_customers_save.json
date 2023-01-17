@@ -1,7 +1,7 @@
 [
   {
     "name": "bob",
-    "password": "123",
+    "password": "$2b$13$TeU.0vKEgnnu56HAvc3nBeFExqvY14HM9MnpfuQQxf.CgPZKVwUMi",
     "accounts": []
   }
 ]

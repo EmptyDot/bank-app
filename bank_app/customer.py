@@ -25,7 +25,6 @@ class Customer:
         :param other_name: The name to be checked
         :return: True if equal else False
         """
-
         return self.name == other_name.lower()
 
     def check_password(self, other_password: str) -> bool:
@@ -55,13 +54,6 @@ class Customer:
             "accounts": [account.to_json() for account in self.accounts],
         }
 
-    def __eq__(self, other):
-        return (
-            isinstance(other, Customer)
-            and self.name == other.name
-            and self.password == other.password
-            and self.accounts == other.accounts
-        )
 
     def __str__(self):
         return f"Customer({self.name}, {self.password}, accounts={self.accounts})"

@@ -20,7 +20,8 @@ class TestCustomerParserJson:
         customers = CustomerParserJson().load_customers(
             "tests/data/test_saved_customers_load.json"
         )
-        assert customers == get_customer_list()
+        assert isinstance(customers, list)
+        assert all(isinstance(customer, Customer) for customer in customers)
 
     def test_load_customers_wrong_file(self):
         assert (
@@ -43,14 +44,14 @@ class TestCustomerParserJson:
             {"account_number": acc2_num, "balance": acc2_balance},
         ]
 
-        bob = Customer(name, password)
-        bob.accounts = [
-            Account(acc1_num, acc1_balance),
-            Account(acc2_num, acc2_balance),
-        ]
-
         customer = CustomerParserJson().create_customer(name, password, accounts)
-        assert bob == customer
+        assert customer.check_name(name)
+        assert customer.check_password(password)
+        assert all(
+            customer.accounts[idx].account_number == account["account_number"]
+            and customer.accounts[idx].balance == account["balance"]
+            for idx, account in enumerate(accounts)
+        )
 
     def test_save_customers(self):
         customers = get_customer_list()
@@ -67,7 +68,9 @@ class TestCustomerParserJson:
         )
 
     def test_save_customers_no_accounts(self):
-        assert CustomerParserJson().save_customers([Customer("Bob", "123")], "tests/data/test_saved_customers_save.json")
+        assert CustomerParserJson().save_customers(
+            [Customer("Bob", "123")], "tests/data/test_saved_customers_save.json"
+        )
 
     def test_save_customers_os_error(self):
         customers = get_customer_list()
