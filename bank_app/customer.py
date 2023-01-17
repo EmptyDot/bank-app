@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 from bank_app import logger
 from .account import Account
+from passlib.hash import bcrypt
 
 
 class Customer:
@@ -7,6 +10,14 @@ class Customer:
         self.name = name.lower()
         self.password = password
         self.accounts: list[Account] = []
+
+    @property
+    def password(self):
+        return self.__password
+
+    @password.setter
+    def password(self, password: str):
+        self.__password = bcrypt.using(rounds=13).hash(password)
 
     def check_name(self, other_name: str) -> bool:
         """
@@ -23,7 +34,7 @@ class Customer:
         :param other_password: The password to be checked
         :return: True if equal else False
         """
-        return self.password == other_password
+        return bcrypt.verify(other_password, self.password)
 
     def add_account(self, account: Account) -> bool:
         """
