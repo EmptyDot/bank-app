@@ -1,7 +1,7 @@
 [
   {
     "name": "dan",
-    "password": "btGx6Kh?38@3QaMT",
+    "password": "$2b$13$xLBUTx0otgVdvPXn3N9x5uz6Xeag1alAi2zfarLM8Sb05CqfQMh.W",
     "accounts": [
       {
         "account_number": 25192847,
@@ -15,7 +15,7 @@
   },
   {
     "name": "edvin",
-    "password": "$HQn@DmomrE6esbs",
+    "password": "$2b$13$wZET8T1lPsMddGOim1ccjevYjntCt.EdOm1/oGCnmdjl/01Pc40M.",
     "accounts": []
   }
 ]
