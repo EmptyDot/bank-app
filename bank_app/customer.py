@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from bank_app import logger
 from .account import Account
 from passlib.hash import bcrypt
