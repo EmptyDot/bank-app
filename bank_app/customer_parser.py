@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from os import PathLike
 from typing import Optional
 
 from bank_app.customer import Customer
@@ -8,7 +9,7 @@ from bank_app.customer import Customer
 
 class CustomerParser(ABC):
     @abstractmethod
-    def load_customers(self, file_path: Optional[str] = "") -> list[Customer] | None:
+    def load_customers(self, file_path: PathLike[str] = "") -> list[Customer] | None:
         """
         Load saved customers from the previous instance
         :param file_path: Path to file to load from
@@ -17,7 +18,9 @@ class CustomerParser(ABC):
         pass
 
     @abstractmethod
-    def save_customers(self, customers: list[Customer], file_path: Optional[str] = "") -> bool:
+    def save_customers(
+        self, customers: list[Customer], file_path: PathLike[str] = ""
+    ) -> bool:
         """
         Save a list of customers
         :param customers: The list of customers to be saved

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import atexit
 import logging
+from os import PathLike
 from typing import Optional
 
 from bank_app import logger
@@ -13,16 +14,21 @@ from .parser_json import CustomerParserJson
 
 class Bank:
     def __init__(
-        self, save_on_exit: bool = True, parser: CustomerParser = CustomerParserJson()
+        self,
+        save_on_exit: bool = True,
+        parser: CustomerParser = CustomerParserJson(),
+        save_file_path: PathLike[str] = "",
     ):
         self.customers: list[Customer] = []
         self.current_user: Optional[Customer] = None
         self.__parser = parser
 
         if save_on_exit:
-            atexit.register(self.__parser.save_customers, self.customers)
+            atexit.register(
+                self.__parser.save_customers, self.customers, save_file_path
+            )
 
-    def load_customers(self, file_path: Optional[str] = "") -> bool:
+    def load_customers(self, file_path: PathLike[str] = "") -> bool:
         """
         Load the saved customers
         :param file_path: Path to the file to load from

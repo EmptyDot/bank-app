@@ -6,9 +6,13 @@ from passlib.hash import bcrypt
 
 
 class Customer:
-    def __init__(self, name: str, password: str):
+    def __init__(self, name: str, password: str, hash_password: bool = True):
         self.name = name.lower()
-        self.password = password
+        if hash_password:
+            self.password = password
+        else:
+            self.__password = password
+
         self.accounts: list[Account] = []
 
     @property
@@ -53,7 +57,6 @@ class Customer:
             "password": self.password,
             "accounts": [account.to_json() for account in self.accounts],
         }
-
 
     def __str__(self):
         return f"Customer({self.name}, {self.password}, accounts={self.accounts})"

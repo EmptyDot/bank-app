@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import logging
 from json import JSONDecodeError
+from os import PathLike
 from typing import Union, Optional
 
 from bank_app import logger
@@ -21,7 +22,7 @@ class CustomerParserJson(CustomerParser):
     """
 
     def load_customers(
-        self, file_path: Optional[str] = DEFAULT_FILE_PATH
+        self, file_path: PathLike[str] = DEFAULT_FILE_PATH
     ) -> list[Customer] | None:
         """
         Load saved customers from the previous instance
@@ -53,14 +54,14 @@ class CustomerParserJson(CustomerParser):
         """
         Create a customer object
         """
-        customer = Customer(name, password)
+        customer = Customer(name, password, hash_password=False)
         if accounts:
             for account_args in accounts:
                 customer.add_account(Account(**account_args))
         return customer
 
     def save_customers(
-        self, customers: list[Customer], file_path: Optional[str] = DEFAULT_FILE_PATH
+        self, customers: list[Customer], file_path: PathLike[str] = DEFAULT_FILE_PATH
     ) -> bool:
         """
         Save a list of customers
@@ -84,4 +85,3 @@ class CustomerParserJson(CustomerParser):
             logger.log_message(f"{type(e).__name__}: {e}", logging.ERROR)
 
         return False
-
