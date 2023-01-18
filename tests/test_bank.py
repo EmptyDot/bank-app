@@ -1,14 +1,20 @@
+import pathlib
+
 from bank_app.customer import Customer
 from bank_app.account import Account
-from tests.mock_objects.mock_bank import MockBank
+from bank_app.bank import Bank
 
 
 def get_bank(customers: list[Customer] = None):
     customers = customers if customers else []
-    return MockBank(customers, save_on_exit=False)
+    return Bank(customers, save_on_exit=False)
 
 
 class TestBank:
+    def test_load_customers_with_file(self):
+        bank = get_bank()
+        bank.load_customers(pathlib.Path("test_saved_customers_load.json"))
+
     def test_get_customers(self):
         customers = [Customer("Bob", "123"), Customer("Alice", "456")]
         bank = get_bank(customers)
