@@ -1,5 +1,5 @@
 # bank-app
-[![Code Coverage](https://img.shields.io/json?url=https://gist.github.com/EmptyDot/01ba42d0d77ac026245790b4fef064c2)](https://github.com/EmptyDot/bank-app/actions/workflows/test.yml)
+[![Code Coverage](https://img.shields.io/json?url=https://gist.githubusercontent.com/EmptyDot/01ba42d0d77ac026245790b4fef064c2/raw/ff5fc4429f7304f9bf3224d500146809740e54a6/coverage_endpoint.json)](https://github.com/EmptyDot/bank-app/actions/workflows/test.yml)
 
 Hej Niklas! Välkommen till min bank app!
 
