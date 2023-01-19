@@ -38,10 +38,7 @@ jobs:
       - name: Run jq
         uses: sergeysova/jq-action@v2.3.0
         with:
-          cmd: jq .totals.percent_covered coverage.json -r
-
-      - name: Create json endpoint
-        run: echo '{"schemaVersion":1,"label":"Coverage","message":${{ steps.totals.percent_covered.outputs.value }},"color":"hsl(50, 100%, 40%)"}' > endpoint.json
+          cmd: coverage.json | jq .totals | {"schemaVersion":1,"label":"Coverage","message":.percent_covered,"color":"hsl(50, 100%, 40%)"} > endpoint.json
 
       # https://github.com/marketplace/actions/deploy-to-gist
       - name: Deploy to gist
