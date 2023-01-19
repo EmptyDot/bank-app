@@ -42,7 +42,7 @@ jobs:
           cmd: 'jq .totals.percent_covered_display coverage.json -r'
 
       - name: Create json endpoint
-        run: echo '{"schemaVersion":1,"label":"Coverage","message":"${{ steps.percent_covered_display.outputs.value }}","color":"hsl(50, 100%, 40%)"}' > coverage_endpoint.json
+        run: echo '{"schemaVersion":1,"label":"Coverage","message":"${{ steps.percent_covered_display.outputs.value }}%","color":"hsl(50, 100%, 40%)"}' > coverage_endpoint.json
 
       # https://github.com/marketplace/actions/deploy-to-gist
       - name: Deploy to gist
