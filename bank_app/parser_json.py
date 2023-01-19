@@ -1,19 +1,21 @@
 import json
 import logging
 from json import JSONDecodeError
+from os import PathLike
 
-from typing import Optional
+from typing import Optional, Union
 
 from bank_app import logger
 from .account import Account
-from .aliases import AccountArgs, FilePath
 from .customer import Customer
+
+AccountArgs = dict[str, Union[int, float]]
 
 DEFAULT_FILE_PATH = "bank_app/data/saved_customers.json"
 
 
 def load_customers(
-    file_path: FilePath = None,
+    file_path: Union[PathLike[str], str, None] = None,
 ) -> Optional[list[Customer]]:
     """
     Load saved customers from the previous instance
@@ -55,7 +57,7 @@ def create_customer(name: str, password: str, accounts: list[AccountArgs]) -> Cu
     return customer
 
 
-def save_customers(customers: list[Customer], file_path: FilePath = None) -> bool:
+def save_customers(customers: list[Customer], file_path: Union[PathLike[str], str, None] = None) -> bool:
     """
     Save a list of customers
     :param customers: The list of customers to be saved
