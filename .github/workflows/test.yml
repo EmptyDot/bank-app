@@ -33,17 +33,21 @@ jobs:
       - name: Create coverage report
         run: |
           coverage run -m pytest
-          coverage xml -q --skip-empty
-      - name: Code Coverage Report
-        uses: irongut/CodeCoverageSummary@v1.3.0
-        with:
-          filename: coverage.xml
-          badge: true
-          fail_below_min: true
-          format: markdown
-          hide_branch_rate: false
-          hide_complexity: true
-          indicators: true
-          output: both
-          thresholds: '60 80'
+          coverage json
 
+      - name: Run jq
+        uses: sergeysova/jq-action@v2.3.0
+        with:
+          cmd: jq .totals.percent_covered coverage.json -r
+
+      - name: Create json endpoint
+          echo '{"schemaVersion":1,"label":"Coverage","message":${{ steps.totals.percent_covered.outputs.value }},"color":"hsl(50, 100%, 40%)"}' > endpoint.json
+
+      # https://github.com/marketplace/actions/deploy-to-gist
+      - name: Deploy to gist
+        uses: exuanbo/actions-deploy-gist@v1
+        with:
+          token: ${{ secrets.GIST_TOKEN }}
+          gist_id: 01ba42d0d77ac026245790b4fef064c2
+          file_path: endpoint.json
+          file_type: json
