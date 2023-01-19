@@ -26,7 +26,7 @@ def test_load_customers_wrong_file():
 
 
 def test_load_customers_empty_file():
-    assert parser_json.load_customers("tests/data/empty.json") is None
+    assert parser_json.load_customers("tests/data/test_isdir/empty.json") is None
 
 
 def test_load_customers_os_error():
