@@ -1,6 +1,5 @@
 import atexit
 import logging
-from os import PathLike
 from typing import Union, Optional
 
 from bank_app import parser_json
@@ -14,7 +13,7 @@ class Bank:
         self,
         customers: Optional[list[Customer]] = None,
         save_on_exit: bool = True,
-        save_file_path: Union[PathLike[str], str, None] = None,
+        save_file_path: Optional[str] = None,
     ):
         self.customers: list[Customer] = customers if customers else []
         self.current_user: Optional[Customer] = None
@@ -22,7 +21,7 @@ class Bank:
         if save_on_exit:
             atexit.register(parser_json.save_customers, self.customers, save_file_path)
 
-    def load_customers(self, file_path: Union[PathLike[str], str, None] = None) -> bool:
+    def load_customers(self, file_path: Optional[str] = None) -> bool:
         """
         Load the saved customers
         :param file_path: Path to the file to load from
@@ -34,7 +33,7 @@ class Bank:
         logger.log_message("Failed to load customers", logging.CRITICAL)
         return False
 
-    def save_customers(self, save_file_path: Union[PathLike[str], str, None] = None) -> bool:
+    def save_customers(self, save_file_path: Optional[str] = None) -> bool:
         return parser_json.save_customers(self.customers, save_file_path)
 
     def get_customers(self) -> list[Customer]:

@@ -1,7 +1,6 @@
 import json
 import logging
 from json import JSONDecodeError
-from os import PathLike
 
 from typing import Optional, Union
 
@@ -14,7 +13,7 @@ DEFAULT_FILE_PATH = "bank_app/data/saved_customers.json"
 
 
 def load_customers(
-    file_path: Union[PathLike[str], str, None] = None,
+    file_path: Optional[str] = None,
 ) -> Optional[list[Customer]]:
     """
     Load saved customers from the previous instance
@@ -56,7 +55,7 @@ def create_customer(name: str, password: str, accounts: list[dict[str, Union[int
     return customer
 
 
-def save_customers(customers: list[Customer], file_path: Union[PathLike[str], str, None] = None) -> bool:
+def save_customers(customers: list[Customer], file_path: Optional[str] = None) -> bool:
     """
     Save a list of customers
     :param customers: The list of customers to be saved
