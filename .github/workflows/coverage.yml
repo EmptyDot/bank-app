@@ -40,14 +40,15 @@ jobs:
         id: percent_covered_display
         with:
           cmd: 'jq .totals.percent_covered_display coverage.json -r'
-
-      - name: Create json endpoint
-        run: echo '{"schemaVersion":1,"label":"Coverage","message":"${{ steps.percent_covered_display.outputs.value }}%","color":"hsl(50, 100%, 40%)"}' > coverage_endpoint.json
-
-      # https://github.com/marketplace/actions/deploy-to-gist
-      - name: Deploy to gist
-        uses: exuanbo/actions-deploy-gist@v1
+          
+      - name: Create Badge
+        uses: Schneegans/dynamic-badges-action@v1.6.0
         with:
-          token: ${{ secrets.TOKEN }}
-          gist_id: ${{ vars.GIST_ID }}
-          file_path: coverage_endpoint.json
+          auth: ${{ secrets.TOKEN }}
+          gistID: 651703a1c1bca09b4e9b8f3e8a4d60e1
+          filename: coverage_endpoint.json
+          label: coverage
+          message: ${{ steps.percent_covered_display.outputs.value }}%
+          valColorRange: ${{ steps.percent_covered_display.outputs.value }}
+          maxColorRange: 100
+          minColorRange: 0
