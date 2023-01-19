@@ -1,5 +1,6 @@
 # bank-app
- 
+![Code Coverage](https://img.shields.io/badge/Code%20Coverage-99%25-success?style=flat)
+
 Hej Niklas! Välkommen till min bank app!
 
 ## Körning
