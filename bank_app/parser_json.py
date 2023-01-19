@@ -9,7 +9,6 @@ from bank_app import logger
 from .account import Account
 from .customer import Customer
 
-AccountArgs = dict[str, Union[int, float]]
 
 DEFAULT_FILE_PATH = "bank_app/data/saved_customers.json"
 
@@ -45,7 +44,7 @@ def load_customers(
     return None
 
 
-def create_customer(name: str, password: str, accounts: list[AccountArgs]) -> Customer:
+def create_customer(name: str, password: str, accounts: list[dict[str, Union[int, float]]]) -> Customer:
     """
     Create a customer object
     """
