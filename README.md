@@ -1,5 +1,5 @@
 # bank-app
-![Code Coverage](https://img.shields.io/badge/Code%20Coverage-99%25-success?style=flat)
+[![Code Coverage](https://img.shields.io/json?url=https://gist.github.com/EmptyDot/01ba42d0d77ac026245790b4fef064c2)](https://github.com/EmptyDot/bank-app/actions/workflows/test.yml)
 
 Hej Niklas! Välkommen till min bank app!
 
@@ -28,8 +28,6 @@ Kör testen:
 ```
 pytest
 ```
-
-Om du inte vill köra testen själv så går coverage reports att hitta i #33
 
 ## Issues
 Om du vill veta varför jag gjorde på ett visst sätt har jag dokumenterat hela processen i github issues.
