@@ -1,7 +1,6 @@
-from __future__ import annotations
-
 import logging
 from decimal import Decimal, getcontext
+from typing import Union
 
 from bank_app import logger
 
@@ -9,7 +8,7 @@ getcontext()
 
 
 class Account:
-    def __init__(self, account_number: int, balance: int | float = 0):
+    def __init__(self, account_number: int, balance: Union[int, float] = 0):
         self.account_number = account_number
         self.__balance = Decimal(balance)
 
@@ -21,7 +20,7 @@ class Account:
         """
         return float(round(self.__balance, 2))
 
-    def balance_add(self, amount: int | float) -> bool:
+    def balance_add(self, amount: Union[int, float]) -> bool:
         """
         Add an amount to the current account balance
         :param amount: Amount to be added
@@ -34,7 +33,7 @@ class Account:
         self.__balance = self.__balance + Decimal(amount)
         return True
 
-    def balance_sub(self, amount: int | float) -> bool:
+    def balance_sub(self, amount: Union[int, float]) -> bool:
         """
         Subtract an amount from the current account balance
         :param amount: Amount to be subtracted
