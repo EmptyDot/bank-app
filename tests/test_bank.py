@@ -31,14 +31,15 @@ class TestBank:
         assert bank.load_customers("tests/data/test_saved_customers_load.json")
         assert len(bank.customers) > 0
 
-    def test_load_customers_wrong_file(self):
+    def test_load_customers_wrong_file(self, tmp_path):
         bank = get_bank()
-        assert bank.load_customers("tests/data/isdir/empty.json") is False
+        assert bank.load_customers(tmp_path/"empty.json") is False
 
-    def test_save_customers(self):
+    def test_save_customers(self, tmp_path):
         customers = [Customer("Bob", "123"), Customer("Alice", "456")]
         bank = get_bank(customers)
-        assert bank.save_customers("tests/data/test_saved_customers_save.json")
+        file_path = tmp_path/"test_saved_customers.json"
+        assert bank.save_customers(file_path)
 
     def test_save_customers_no_customers(self):
         bank = get_bank()

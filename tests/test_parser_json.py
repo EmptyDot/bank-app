@@ -21,16 +21,19 @@ def test_load_customers():
     assert all(isinstance(customer, Customer) for customer in customers)
 
 
-def test_load_customers_wrong_file():
-    assert parser_json.load_customers("tests/data/does_not_exist.json") is None
+def test_load_customers_wrong_file(tmp_path):
+    assert parser_json.load_customers(tmp_path/"wrong_file.json") is None
 
 
-def test_load_customers_empty_file():
-    assert parser_json.load_customers("tests/data/test_isdir/empty.json") is None
+def test_load_customers_empty_file(tmp_path):
+    open(tmp_path/"empty.json", "a").close()
+    assert parser_json.load_customers(tmp_path/"empty.json") is None
 
 
-def test_load_customers_os_error():
-    assert parser_json.load_customers("tests/data/test_isdir") is None
+def test_load_customers_os_error(tmp_path):
+    isdir = tmp_path/"isdir"
+    isdir.mkdir()
+    assert parser_json.load_customers(isdir) is None
 
 
 def test_create_customer():
@@ -52,26 +55,28 @@ def test_create_customer():
     )
 
 
-def test_save_customers():
+def test_save_customers(tmp_path):
     customers = get_customer_list()
     assert parser_json.save_customers(
-        customers, "tests/data/test_saved_customers_save.json"
+        customers, tmp_path/"test_saved_customers.json"
     )
 
 
-def test_save_customers_no_customers():
+def test_save_customers_no_customers(tmp_path):
     assert (
-        parser_json.save_customers([], "tests/data/test_saved_customers_save.json")
+        parser_json.save_customers([], tmp_path/"test_saved_customers.json")
         is False
     )
 
 
-def test_save_customers_no_accounts():
+def test_save_customers_no_accounts(tmp_path):
     assert parser_json.save_customers(
-        [Customer("Bob", "123")], "tests/data/test_saved_customers_save.json"
+        [Customer("Bob", "123")], tmp_path/"test_saved_customers.json"
     )
 
 
-def test_save_customers_os_error():
+def test_save_customers_os_error(tmp_path):
+    isdir = tmp_path/"isdir"
+    isdir.mkdir()
     customers = get_customer_list()
-    assert parser_json.save_customers(customers, "tests/data/test_isdir") is False
+    assert parser_json.save_customers(customers, isdir) is False
