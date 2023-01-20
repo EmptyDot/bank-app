@@ -1,5 +1,3 @@
-import pathlib
-
 from bank_app.customer import Customer
 from bank_app.account import Account
 from bank_app.bank import Bank
@@ -11,9 +9,23 @@ def get_bank(customers: list[Customer] = None):
 
 
 class TestBank:
-    def test_load_customers_with_file(self):
+    def test_load_customers(self):
         bank = get_bank()
-        bank.load_customers(pathlib.Path("test_saved_customers_load.json"))
+        assert bank.load_customers("tests/data/test_saved_customers_load.json")
+        assert len(bank.customers) > 0
+
+    def test_load_customers_wrong_file(self):
+        bank = get_bank()
+        assert bank.load_customers("tests/data/isdir/empty.json") is False
+
+    def test_save_customers(self):
+        customers = [Customer("Bob", "123"), Customer("Alice", "456")]
+        bank = get_bank(customers)
+        assert bank.save_customers("tests/data/test_saved_customers_save.json")
+
+    def test_save_customers_no_customers(self):
+        bank = get_bank()
+        assert bank.save_customers() is False
 
     def test_get_customers(self):
         customers = [Customer("Bob", "123"), Customer("Alice", "456")]
@@ -271,6 +283,16 @@ class TestBank:
         bank.current_user.accounts = [Account(1, 100)]
         assert bank.withdraw(1, "1") is False
         assert bank.current_user.accounts[0].balance == 100
+
+    def test_to_json(self):
+        customers = [Customer("Bob", "123"), Customer("Alice", "456")]
+        customers[0].accounts = [Account(1, 123.4), Account(2, 456)]
+        bank = get_bank(customers)
+        bank.current_user = customers[0]
+        assert bank.to_json() == {
+            "customers": [customer.to_json() for customer in bank.customers],
+            "current_user": customers[0].to_json(),
+        }
 
     def test___str__(self):
         customer = Customer("Bob", "123")
