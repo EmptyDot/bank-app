@@ -36,3 +36,6 @@ Kör testen:
 pytest
 ```
 
+----------------
+Tack för att du tar dig tiden att kolla :)  
+Snälla säg till mig om det är något jag kan förbättra!
