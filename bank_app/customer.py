@@ -46,7 +46,7 @@ class Customer:
         if isinstance(account, Account):
             self.accounts.append(account)
             return True
-        logger.log_exception(TypeError(f"Expected type Account, got {type(account)}"))
+        logger.log_message(TypeError(f"Expected type Account, got {type(account)}"))
         return False
 
     def to_json(self):

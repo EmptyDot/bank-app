@@ -34,16 +34,18 @@ def load_customers(
             return customers
 
     except FileNotFoundError as e:
-        logger.log_exception(e)
+        logger.log_message(e)
     except OSError as e:
-        logger.log_exception(e)
+        logger.log_message(e)
     except JSONDecodeError as e:
-        logger.log_exception(e)
+        logger.log_message(e)
 
     return None
 
 
-def create_customer(name: str, password: str, accounts: list[dict[str, Union[int, float]]]) -> Customer:
+def create_customer(
+    name: str, password: str, accounts: list[dict[str, Union[int, float]]]
+) -> Customer:
     """
     Create a customer object
     """
@@ -76,6 +78,6 @@ def save_customers(customers: list[Customer], file_path: Optional[str] = None) -
             file.write(json_str)
             return True
     except OSError as e:
-        logger.log_message(f"{type(e).__name__}: {e}", logging.ERROR)
+        logger.log_message(e)
 
     return False

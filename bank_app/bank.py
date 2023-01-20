@@ -58,7 +58,7 @@ class Bank:
             return False
 
         if not isinstance(name, str) or not isinstance(password, str):
-            logger.log_exception(
+            logger.log_message(
                 TypeError(
                     f"Expected type (str, str), "
                     f"got ({type(name)}, {type(password)})"
@@ -169,7 +169,7 @@ class Bank:
             return False
 
         if not isinstance(account_number, int):
-            logger.log_exception(
+            logger.log_message(
                 TypeError(f"Expected type int, got {type(account_number)}")
             )
             return False
@@ -212,7 +212,7 @@ class Bank:
         :return: True if successful else False
         """
         if not isinstance(amount, (int, float)):
-            logger.log_exception(
+            logger.log_message(
                 TypeError(f"Expected type (int | float), got {type(amount)}")
             )
             return False
@@ -230,7 +230,7 @@ class Bank:
         :return: True if successful else False
         """
         if not isinstance(amount, (int, float)):
-            logger.log_exception(
+            logger.log_message(
                 TypeError(f"Expected type (int | float), got {type(amount)}")
             )
             return False
