@@ -1,3 +1,6 @@
+import atexit
+
+from bank_app import parser_json
 from bank_app.customer import Customer
 from bank_app.account import Account
 from bank_app.bank import Bank
@@ -9,6 +12,20 @@ def get_bank(customers: list[Customer] = None):
 
 
 class TestBank:
+
+    def test_save_on_exit(self, tmp_path):
+        Bank(save_on_exit=True, save_file_path=tmp_path)
+        funcs = []
+
+        class Capture:
+            def __eq__(self, other):
+                funcs.append(other)
+                return False
+
+        c = Capture()
+        atexit.unregister(c)
+        assert funcs[-1] == parser_json.save_customers
+
     def test_load_customers(self):
         bank = get_bank()
         assert bank.load_customers("tests/data/test_saved_customers_load.json")
