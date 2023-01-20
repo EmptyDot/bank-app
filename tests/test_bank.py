@@ -1,9 +1,9 @@
 import atexit
 
 from bank_app import parser_json
-from bank_app.customer import Customer
 from bank_app.account import Account
 from bank_app.bank import Bank
+from bank_app.customer import Customer
 
 
 def get_bank(customers: list[Customer] = None):
@@ -12,7 +12,6 @@ def get_bank(customers: list[Customer] = None):
 
 
 class TestBank:
-
     def test_save_on_exit(self, tmp_path):
         Bank(save_on_exit=True, save_file_path=tmp_path)
         funcs = []
@@ -33,12 +32,12 @@ class TestBank:
 
     def test_load_customers_wrong_file(self, tmp_path):
         bank = get_bank()
-        assert bank.load_customers(tmp_path/"empty.json") is False
+        assert bank.load_customers(tmp_path / "empty.json") is False
 
     def test_save_customers(self, tmp_path):
         customers = [Customer("Bob", "123"), Customer("Alice", "456")]
         bank = get_bank(customers)
-        file_path = tmp_path/"test_saved_customers.json"
+        file_path = tmp_path / "test_saved_customers.json"
         assert bank.save_customers(file_path)
 
     def test_save_customers_no_customers(self):

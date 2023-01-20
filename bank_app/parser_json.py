@@ -1,13 +1,11 @@
 import json
 import logging
 from json import JSONDecodeError
-
 from typing import Optional, Union
 
 from bank_app import logger
 from .account import Account
 from .customer import Customer
-
 
 DEFAULT_FILE_PATH = "bank_app/data/saved_customers.json"
 

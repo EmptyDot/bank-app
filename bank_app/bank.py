@@ -2,8 +2,8 @@ import atexit
 import logging
 from typing import Union, Optional
 
-from bank_app import parser_json
 from bank_app import logger
+from bank_app import parser_json
 from .account import Account
 from .customer import Customer
 

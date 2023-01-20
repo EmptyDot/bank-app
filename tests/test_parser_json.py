@@ -1,7 +1,8 @@
+from passlib.hash import bcrypt
+
+from bank_app import parser_json
 from bank_app.account import Account
 from bank_app.customer import Customer
-from bank_app import parser_json
-from passlib.hash import bcrypt
 
 
 def get_customer_list():
@@ -22,16 +23,16 @@ def test_load_customers():
 
 
 def test_load_customers_wrong_file(tmp_path):
-    assert parser_json.load_customers(tmp_path/"wrong_file.json") is None
+    assert parser_json.load_customers(tmp_path / "wrong_file.json") is None
 
 
 def test_load_customers_empty_file(tmp_path):
-    open(tmp_path/"empty.json", "a").close()
-    assert parser_json.load_customers(tmp_path/"empty.json") is None
+    open(tmp_path / "empty.json", "a").close()
+    assert parser_json.load_customers(tmp_path / "empty.json") is None
 
 
 def test_load_customers_os_error(tmp_path):
-    isdir = tmp_path/"isdir"
+    isdir = tmp_path / "isdir"
     isdir.mkdir()
     assert parser_json.load_customers(isdir) is None
 
@@ -57,26 +58,23 @@ def test_create_customer():
 
 def test_save_customers(tmp_path):
     customers = get_customer_list()
-    assert parser_json.save_customers(
-        customers, tmp_path/"test_saved_customers.json"
-    )
+    assert parser_json.save_customers(customers, tmp_path / "test_saved_customers.json")
 
 
 def test_save_customers_no_customers(tmp_path):
     assert (
-        parser_json.save_customers([], tmp_path/"test_saved_customers.json")
-        is False
+        parser_json.save_customers([], tmp_path / "test_saved_customers.json") is False
     )
 
 
 def test_save_customers_no_accounts(tmp_path):
     assert parser_json.save_customers(
-        [Customer("Bob", "123")], tmp_path/"test_saved_customers.json"
+        [Customer("Bob", "123")], tmp_path / "test_saved_customers.json"
     )
 
 
 def test_save_customers_os_error(tmp_path):
-    isdir = tmp_path/"isdir"
+    isdir = tmp_path / "isdir"
     isdir.mkdir()
     customers = get_customer_list()
     assert parser_json.save_customers(customers, isdir) is False

@@ -1,6 +1,7 @@
+from passlib.hash import bcrypt
+
 from bank_app import logger
 from .account import Account
-from passlib.hash import bcrypt
 
 
 class Customer:
