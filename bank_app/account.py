@@ -1,3 +1,4 @@
+from __future__ import annotations
 import logging
 from decimal import Decimal, getcontext
 from typing import Union
@@ -49,7 +50,7 @@ class Account:
         self.__balance = self.__balance - Decimal(amount)
         return True
 
-    def check_account_number(self, other_account_number):
+    def check_account_number(self, other_account_number: int):
         """
         Check if account number matches another account number
         :param other_account_number: The account number to be checked
