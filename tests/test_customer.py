@@ -37,11 +37,6 @@ class TestCustomer:
         c = Customer("Bob", "123456789")
         assert c.add_account("Hi") is False
 
-    def test___eq__true(self):
-        bob = Customer("Bob", "123")
-        bob2 = Customer("Bob", "123")
-        assert bob is not bob2 and bob == bob2
-
     def test___eq__false(self):
         bob = Customer("Bob", "123")
         alice = Customer("Alice", "456")
@@ -54,9 +49,9 @@ class TestCustomer:
     def test___str__(self):
         c = Customer("Bob", "123")
         c.add_account(Account(1, 0))
-        assert str(c) == f"Customer(bob, 123, accounts={[Account(1, 0)]})"
+        assert str(c) == f"Customer({c.name}, {c.password}, accounts={[Account(1, 0)]})"
 
     def test___repr__(self):
         c = Customer("Bob", "123")
         c.add_account(Account(1, 0))
-        assert repr(c) == f"Customer(bob, 123)"
+        assert repr(c) == f"Customer({c.name}, {c.password})"

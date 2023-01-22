@@ -1,13 +1,49 @@
-from bank_app.customer import Customer
+import atexit
+
+from bank_app import parser_json
 from bank_app.account import Account
-from tests.mock_objects.mock_bank import MockBank
+from bank_app.bank import Bank
+from bank_app.customer import Customer
 
 
 def get_bank(customers: list[Customer] = None):
     customers = customers if customers else []
-    return MockBank(customers, save_on_exit=False)
+    return Bank(customers, save_on_exit=False)
+
 
 class TestBank:
+    def test_save_on_exit(self, tmp_path):
+        Bank(save_on_exit=True, save_file_path=tmp_path)
+        funcs = []
+
+        class Capture:
+            def __eq__(self, other):
+                funcs.append(other)
+                return False
+
+        c = Capture()
+        atexit.unregister(c)
+        assert funcs[-1] == parser_json.save_customers
+
+    def test_load_customers(self):
+        bank = get_bank()
+        assert bank.load_customers("tests/data/test_saved_customers_load.json")
+        assert len(bank.customers) > 0
+
+    def test_load_customers_wrong_file(self, tmp_path):
+        bank = get_bank()
+        assert bank.load_customers(tmp_path / "empty.json") is False
+
+    def test_save_customers(self, tmp_path):
+        customers = [Customer("Bob", "123"), Customer("Alice", "456")]
+        bank = get_bank(customers)
+        file_path = tmp_path / "test_saved_customers.json"
+        assert bank.save_customers(file_path)
+
+    def test_save_customers_no_customers(self):
+        bank = get_bank()
+        assert bank.save_customers() is False
+
     def test_get_customers(self):
         customers = [Customer("Bob", "123"), Customer("Alice", "456")]
         bank = get_bank(customers)
@@ -18,32 +54,29 @@ class TestBank:
         name, password = "Bob", "123"
         assert bank.add_customer(name, password)
         assert len(bank.customers) == 1
-        assert bank.customers[-1] == Customer(name, password)
+        c = bank.customers[0]
+        assert c.check_name(name) and c.check_password(password)
 
     def test_add_customer_non_unique(self):
         bank = get_bank()
         name, password = "Bob", "123"
-        c = Customer(name, password)
         assert bank.add_customer(name, password)
         assert bank.add_customer(name, password) is False
         assert len(bank.customers) == 1
-        assert bank.customers[-1] == c
+        c = bank.customers[0]
+        assert c.check_name(name) and c.check_password(password)
 
     def test_add_customer_wrong_type(self):
         bank = get_bank()
-        name, password = ["bob"], 123
-        assert bank.add_customer(name, password) is False
+        assert bank.add_customer(["bob"], 123) is False
         assert len(bank.customers) == 0
 
     def test_get_customer(self):
-        bank = get_bank([Customer("Bob", "123"), Customer("Alice", "456")])
-
-
-
+        name, password = "Bob", "123"
+        bank = get_bank([Customer(name, password)])
         c = bank.get_customer("Bob")
-        bob = Customer("Bob", "123")
         assert c is not None
-        assert bob == c
+        assert c.check_name(name) and c.check_password("123")
 
     def test_get_customer_fail(self):
         bank = get_bank()
@@ -52,7 +85,7 @@ class TestBank:
     def test_change_customer_password(self):
         bank = get_bank([Customer("Bob", "123"), Customer("Alice", "456")])
         assert bank.change_customer_password("Bob", "789")
-        assert bank.customers[0].password == "789"
+        assert bank.customers[0].check_password("789")
 
     def test_change_customer_password_fail(self):
         bank = get_bank([Customer("Bob", "123")])
@@ -82,9 +115,12 @@ class TestBank:
         assert bank.current_user is None
 
     def test_login(self):
-        bank = get_bank([Customer("Bob", "123")])
+        name, password = "Bob", "123"
+        bank = get_bank([Customer(name, password)])
         assert bank.login("Bob", "123")
-        assert bank.current_user == Customer("Bob", "123")
+        assert bank.current_user.check_name(
+            name.lower()
+        ) and bank.current_user.check_password("123")
 
     def test_login_wrong_password(self):
         bank = get_bank([Customer("Bob", "123")])
@@ -265,29 +301,35 @@ class TestBank:
         assert bank.withdraw(1, "1") is False
         assert bank.current_user.accounts[0].balance == 100
 
+    def test_to_json(self):
+        customers = [Customer("Bob", "123"), Customer("Alice", "456")]
+        customers[0].accounts = [Account(1, 123.4), Account(2, 456)]
+        bank = get_bank(customers)
+        bank.current_user = customers[0]
+        assert bank.to_json() == {
+            "customers": [customer.to_json() for customer in bank.customers],
+            "current_user": customers[0].to_json(),
+        }
+
     def test___str__(self):
-        bank = get_bank([Customer("Bob", "123")])
-        assert (str(bank) == f'Bank({[Customer("Bob", "123")]}, current_user=None)')
+        customer = Customer("Bob", "123")
+        bank = get_bank([customer])
+        assert str(bank) == f"Bank({[customer]}, current_user=None)"
 
     def test___str__logged_in(self):
-        bank = MockBank([Customer("Bob", "123")], save_on_exit=False)
-        bank.current_user = Customer("Bob", "123")
-        assert (
-            str(bank)
-            == f'Bank({[Customer("Bob", "123")]}, current_user={Customer("Bob", "123")})'
-        )
+        customer = Customer("Bob", "123")
+        bank = get_bank([customer])
+        bank.current_user = customer
+        assert str(bank) == f"Bank({[customer]}, current_user={customer})"
 
     def test___repr__(self):
-        bank = MockBank([Customer("Bob", "123"), Customer("Alice", "456")], save_on_exit=False)
-        assert (
-            repr(bank)
-            == f'Bank({[Customer("Bob", "123"), Customer("Alice", "456")]}, current_user=None)'
-        )
+        customers = [Customer("Bob", "123"), Customer("Alice", "456")]
+        bank = get_bank(customers)
+        assert repr(bank) == f"Bank({customers}, current_user=None)"
 
     def test___repr__logged_in(self):
-        bank = MockBank([Customer("Bob", "123")], save_on_exit=False)
-        bank.current_user = Customer("Bob", "123")
-        assert (
-            repr(bank)
-            == f'Bank({[Customer("Bob", "123")]}, current_user={Customer("Bob", "123")})'
-        )
+        customers = [Customer("Bob", "123"), Customer("Alice", "456")]
+        bank = get_bank(customers)
+
+        bank.current_user = customers[0]
+        assert repr(bank) == f"Bank({customers}, current_user={customers[0]})"

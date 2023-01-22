@@ -1,43 +1,40 @@
-from __future__ import annotations
-
 import atexit
 import logging
-from typing import Optional
+from typing import Union, Optional
 
 from bank_app import logger
+from bank_app import parser_json
 from .account import Account
 from .customer import Customer
-from .customer_parser import CustomerParser
-from .parser_json import CustomerParserJson
 
 
 class Bank:
     def __init__(
-        self, save_on_exit: bool = True, parser: CustomerParser = CustomerParserJson()
+        self,
+        customers: Optional[list[Customer]] = None,
+        save_on_exit: bool = True,
+        save_file_path: Optional[str] = None,
     ):
-        self.customers: list[Customer] = []
+        self.customers: list[Customer] = customers if customers else []
         self.current_user: Optional[Customer] = None
-        self.__parser = parser
 
         if save_on_exit:
-            atexit.register(self.__parser.save_customers, self.customers)
+            atexit.register(parser_json.save_customers, self.customers, save_file_path)
 
-    def load_customers(self, file_path: Optional[str] = "") -> bool:
+    def load_customers(self, file_path: Optional[str] = None) -> bool:
         """
         Load the saved customers
         :param file_path: Path to the file to load from
         :return: True if successful else False
         """
-        if file_path:
-            if customers := self.__parser.load_customers(file_path):
-                self.customers.extend(customers)
-                return True
-        else:
-            if customers := self.__parser.load_customers():
-                self.customers.extend(customers)
-                return True
-        logger.log_message(f"Failed to load customers", logging.CRITICAL)
+        if customers := parser_json.load_customers(file_path):
+            self.customers.extend(customers)
+            return True
+        logger.log_message("Failed to load customers", logging.CRITICAL)
         return False
+
+    def save_customers(self, save_file_path: Optional[str] = None) -> bool:
+        return parser_json.save_customers(self.customers, save_file_path)
 
     def get_customers(self) -> list[Customer]:
         """
@@ -61,9 +58,10 @@ class Bank:
             return False
 
         if not isinstance(name, str) or not isinstance(password, str):
-            logger.log_exception(
+            logger.log_message(
                 TypeError(
-                    f"Expected type (str, str), got ({type(name)}, {type(password)})"
+                    f"Expected type (str, str), "
+                    f"got ({type(name)}, {type(password)})"
                 )
             )
             return False
@@ -72,7 +70,7 @@ class Bank:
         self.customers.append(customer)
         return True
 
-    def get_customer(self, name: str) -> Customer | None:
+    def get_customer(self, name: str) -> Optional[Customer]:
         """
         Get a customer by name
         :param name: Username of a customer
@@ -82,6 +80,7 @@ class Bank:
             if customer.check_name(name):
                 return customer
         logger.log_message(f"Customer of name {name} not found.", logging.WARNING)
+        return None
 
     def change_customer_password(self, name: str, new_password: str) -> bool:
         """
@@ -111,7 +110,10 @@ class Bank:
 
     def login(self, name: str, password: str) -> bool:
         """
-        If the password matches, add this customer from the list of customers as the new logged in customer.
+        If the password matches,
+        add this customer from the list of customers
+        as the new logged in customer.
+
         :param name: Name of the customer
         :param password: Password of the customer
         :return: True if successful else False
@@ -135,14 +137,14 @@ class Bank:
         self.current_user = None
         return True
 
-    def get_accounts(self) -> list[Account] | None:
+    def get_accounts(self) -> Optional[list[Account]]:
         """
         Get all accounts that belong to the currently logged in customer
         :return: The list of accounts
         """
         if not self.current_user:
             logger.log_message("No customer is logged in", logging.WARNING)
-            return
+            return None
 
         return self.current_user.accounts
 
@@ -161,13 +163,13 @@ class Bank:
             for user_account in self.current_user.accounts
         ):
             logger.log_message(
-                f"Customer has no account with account number {account_number}",
+                f"Customer has no account with " f"account number {account_number}",
                 logging.WARNING,
             )
             return False
 
         if not isinstance(account_number, int):
-            logger.log_exception(
+            logger.log_message(
                 TypeError(f"Expected type int, got {type(account_number)}")
             )
             return False
@@ -186,7 +188,7 @@ class Bank:
             return True
         return False
 
-    def get_account(self, account_number: int) -> Account | None:
+    def get_account(self, account_number: int) -> Optional[Account]:
         """
         Get an account from the currently logged in customer.
         :param account_number: Account number of the account.
@@ -200,8 +202,9 @@ class Bank:
                 f"Account with account number {account_number} not found.",
                 logging.WARNING,
             )
+        return None
 
-    def deposit(self, account_number: int, amount: int | float) -> bool:
+    def deposit(self, account_number: int, amount: Union[int, float]) -> bool:
         """
         Deposit money to an account.
         :param account_number: Account number of the account.
@@ -209,7 +212,7 @@ class Bank:
         :return: True if successful else False
         """
         if not isinstance(amount, (int, float)):
-            logger.log_exception(
+            logger.log_message(
                 TypeError(f"Expected type (int | float), got {type(amount)}")
             )
             return False
@@ -219,7 +222,7 @@ class Bank:
 
         return False
 
-    def withdraw(self, account_number: int, amount: int | float) -> bool:
+    def withdraw(self, account_number: int, amount: Union[int, float]) -> bool:
         """
         Withdraw money from an account.
         :param account_number: Account number of the account.
@@ -227,7 +230,7 @@ class Bank:
         :return: True if successful else False
         """
         if not isinstance(amount, (int, float)):
-            logger.log_exception(
+            logger.log_message(
                 TypeError(f"Expected type (int | float), got {type(amount)}")
             )
             return False
@@ -237,16 +240,30 @@ class Bank:
 
         return False
 
-    def to_json(self):
+    def to_json(self) -> dict:
+        """
+        Convert the object to json format
+        :return: dict in json format that represents the object
+        """
         return {
             "customers": [customer.to_json() for customer in self.customers],
             "current_user": self.current_user.to_json()
-            if type(self.current_user) == Customer
+            if isinstance(self.current_user, Customer)
             else "",
         }
 
     def __str__(self):
-        return f"Bank({self.get_customers()}, current_user={self.current_user})"
+        return (
+            f"Bank("
+            f"{self.get_customers()}, "
+            f"current_user={self.current_user}"
+            f")"
+        )
 
     def __repr__(self):
-        return f"Bank({self.get_customers()}, current_user={self.current_user})"
+        return (
+            f"Bank("
+            f"{self.get_customers()}, "
+            f"current_user={self.current_user}"
+            f")"
+        )
