@@ -1,110 +1,142 @@
-from typing import Union
+from __future__ import annotations
 
-from fastapi import FastAPI
-from data_models import Bank, Customer, Account
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from passlib.hash import bcrypt
+from fastapi import FastAPI, Path, Query, Body, Depends
+from pydantic import Required
+
+from API.models.data_models import CustomerInDB, CustomerOutDB, Bank, Customer, CustomerIn, PASSWORD_PARAMS, Account
 
 app = FastAPI()
 
+
+# UTILITY FUNCTIONS
+# ------------------------------------
+
+def hash_password(password: str) -> str:
+    return bcrypt.using(rounds=13).hash(password)
+
+
+def save_customer(customer: CustomerInDB):
+    hashed_password = hash_password(customer.password)
+    customer_out_db = CustomerOutDB(**customer.dict(), hashed_password=hashed_password)
+    # TODO Save to DB
+
+
+
+# SETUP
+# -----------------------------------
+
 bank = Bank()
 
-
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth")
 
 
-@app.get("/")
-def get_bank():
-    return bank.to_json()
+# API
+# -----------------------------------
+
+@app.post("/auth")
+def authenticate(form_data: OAuth2PasswordRequestForm = Depends()):
+    # TODO Do some authentication
+    pass
 
 
 @app.get("/customers")
-def get_customers():
-    return [customer.to_json() for customer in bank.customers]
+def get_customers() -> list[Customer]:
+    pass
 
 
-@app.get("/user")
-def get_logged_in_user():
-    return bank.current_user.to_json() if bank.current_user else None
+@app.post("/customers/add")
+def add_customer(
+    customer: CustomerIn = Body(
+        description="The customer to be added",
+    )
+) -> Customer:
+    pass
 
 
-@app.put("/add/{name}")
-def add_customer(customer: Customer):
-    bank.customers.append(customer)
-    return customer.to_json()
+@app.get("/customers/{name}")
+def get_customer(name: str = Path(title="Name of the customer")) -> Customer:
+    pass
 
 
-@app.get("/{name}")
-def get_customer(name: str):
-    for customer in bank.customers:
-        if customer.name == name:
-        return customer.to_json()
-
-
-@app.put("/customers/{name}/change_password")
-def change_password(name: str, new_password: str):
-    if bank.change_customer_password(name, new_password):
-        return bank.get_customer(name).to_json()
-
-
-@app.put("/customers/{name}/remove")
-def remove_customer(name):
-    if customer := bank.get_customer(name):
-        bank.remove_customer(name)
-        return customer.to_json()
+@app.delete("/customers/remove")
+def remove_customer(customer: CustomerIn):
+    pass
 
 
 @app.put("/login")
-def login(name: str, password: str):
-    if bank.login(name, password):
-        return bank.current_user.to_json()
+def login(customer: CustomerIn) -> Customer:
+    pass
 
 
-@app.get("logout")
-def logout():
-    if customer := bank.current_user:
-        if bank.logout():
-            return customer.to_json()
+# API -> REQUIRES LOGIN
+# ------------------
 
 
-@app.get("/{name}/accounts")
-def get_accounts(name: str):
-    if name == bank.current_user.name:
-        if accounts := bank.get_accounts():
-            return [account.to_json() for account in accounts]
+@app.put("/logout")
+def logout() -> Customer:
+    pass
 
 
-@app.put("/{name}/{account_number}/add")
-def add_account(name: str, account_number: int):
-    if name == bank.current_user.name:
-        if bank.add_account(account_number):
-            return bank.get_account(account_number).to_json()
+@app.put("/change_password")
+def change_customer_password(
+    current_password: str = Query(
+        default=Required, description="Current password", **PASSWORD_PARAMS
+    ),
+    new_password: str = Query(
+        default=Required, description="New password", **PASSWORD_PARAMS
+    ),
+) -> Customer:
+    # if logged in
+    # if current password matches
+    # change to new password
+    pass
 
 
-@app.put("/{name}/{account_number}/remove")
-def remove_account(name: str, account_number: int):
-    if name == bank.current_user.name:
-        if account := bank.get_account(account_number):
-            if bank.remove_account(account_number):
-                return account.to_json()
+@app.get("/accounts")
+def get_accounts() -> list[Account]:
+    pass
 
 
-@app.get("/{name}/{account_number}")
-def get_account(name: str, account_number: int):
-    if name == bank.current_user.name:
-        if account := bank.get_account(account_number):
-            return account.to_json()
+@app.post("/accounts/add")
+def add_account() -> Account:
+    pass
 
 
-@app.put("/{name}/{account_number}/deposit/{amount}")
-def deposit(name: str, account_number: int, amount: Union[int, float]):
-    if name == bank.current_user.name:
-        if bank.deposit(account_number, amount):
-            return bank.get_account(account_number).to_json()
+@app.delete("/accounts/remove")
+def remove_account(account_number: int = Query(default=Required, )):
+    pass
 
 
-@app.put("/{name}/{account_number}/withdraw/{amount}")
-def withdraw(name: str, account_number: int, amount: Union[int, float]):
-    if name == bank.current_user.name:
-        if bank.withdraw(account_number, amount):
-            return bank.get_account(account_number).to_json()
+@app.get("/accounts/{account_number}")
+def get_account(
+    account_number: int = Path(
+        default=Required, description="Account number of the account", gt=0
+    )
+) -> Account:
+    pass
+
+
+@app.put("/accounts/{account_number}/deposit")
+def deposit(
+    account_number: int = Path(
+        default=Required, description="Account number of the account", gt=0
+    ),
+    amount: int = Query(
+        default=Required, description="Amount to be deposited to the account", gt=0
+    ),
+) -> Account:
+    pass
+
+
+@app.put("/accounts/{account_number}/withdraw")
+def withdraw(
+        account_number: int = Path(
+            default=Required, description="Account number of the account", gt=0
+        ),
+        amount: int = Query(
+            default=Required, description="Amount to be withdrawn from the account", gt=0
+        ),
+) -> Account:
+    pass
