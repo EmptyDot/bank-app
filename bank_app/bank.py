@@ -2,10 +2,13 @@ import atexit
 import logging
 from typing import Union, Optional
 
-from bank_app import logger
+from bank_app.logger import log_exception
 from bank_app import parser_json
 from .account import Account
 from .customer import Customer
+
+
+
 
 
 class Bank:
@@ -21,6 +24,7 @@ class Bank:
         if save_on_exit:
             atexit.register(parser_json.save_customers, self.customers, save_file_path)
 
+    @log_exception(OSError)
     def load_customers(self, file_path: Optional[str] = None) -> bool:
         """
         Load the saved customers
@@ -30,8 +34,8 @@ class Bank:
         if customers := parser_json.load_customers(file_path):
             self.customers.extend(customers)
             return True
-        logger.log_message("Failed to load customers", logging.CRITICAL)
-        return False
+
+        raise OSError("Failed to load customers")
 
     def save_customers(self, save_file_path: Optional[str] = None) -> bool:
         return parser_json.save_customers(self.customers, save_file_path)
@@ -43,6 +47,7 @@ class Bank:
         """
         return self.customers
 
+    @log_exception([TypeError, ValueError])
     def add_customer(self, name: str, password: str) -> bool:
         """
         Add a new customer
@@ -52,24 +57,16 @@ class Bank:
         """
 
         if any(customer.check_name(name) for customer in self.customers):
-            logger.log_message(
-                f"Customer with name {name} already exists.", logging.WARNING
-            )
-            return False
+            raise ValueError(f"Customer with name {name} already exists.")
 
         if not isinstance(name, str) or not isinstance(password, str):
-            logger.log_message(
-                TypeError(
-                    f"Expected type (str, str), "
-                    f"got ({type(name)}, {type(password)})"
-                )
-            )
-            return False
+            raise TypeError(f"Expected type (str, str), got ({type(name)}, {type(password)})")
 
         customer = Customer(name, password)
         self.customers.append(customer)
         return True
 
+    @log_exception(CustomerLookupError, default_return=None)
     def get_customer(self, name: str) -> Optional[Customer]:
         """
         Get a customer by name
@@ -79,8 +76,9 @@ class Bank:
         for customer in self.customers:
             if customer.check_name(name):
                 return customer
-        logger.log_message(f"Customer of name {name} not found.", logging.WARNING)
-        return None
+
+        raise CustomerLookupError(name)
+
 
     def change_customer_password(self, name: str, new_password: str) -> bool:
         """
@@ -108,6 +106,7 @@ class Bank:
             return True
         return False
 
+    @log_exception(ValueError)
     def login(self, name: str, password: str) -> bool:
         """
         If the password matches,
@@ -122,21 +121,23 @@ class Bank:
             if customer.check_password(password):
                 self.current_user = customer
                 return True
-            logger.log_message("Incorrect password", logging.WARNING)
+            raise ValueError("Incorrect password")
         return False
 
+    @log_exception(NoCustomerError)
     def logout(self) -> bool:
         """
         Log out the currently logged in customer
         :return: True if successful else False
         """
         if not self.current_user:
-            logger.log_message("No customer is logged in", logging.WARNING)
+            NoCustomerError("No customer is logged in")
             return False
 
         self.current_user = None
         return True
 
+    @log_exception()
     def get_accounts(self) -> Optional[list[Account]]:
         """
         Get all accounts that belong to the currently logged in customer

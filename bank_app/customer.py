@@ -1,6 +1,6 @@
 from passlib.hash import bcrypt
 
-from bank_app import logger
+from bank_app.logger import log_exception
 from .account import Account
 
 
@@ -38,17 +38,18 @@ class Customer:
         """
         return bcrypt.verify(other_password, self.password)
 
+    @log_exception(TypeError)
     def add_account(self, account: Account) -> bool:
         """
         Add a new account to the customer
         :param account: The account to be added
         :return: True if successful else False
         """
-        if isinstance(account, Account):
-            self.accounts.append(account)
-            return True
-        logger.log_message(TypeError(f"Expected type Account, got {type(account)}"))
-        return False
+        if not isinstance(account, Account):
+            raise TypeError(f"Expected type Account, got {type(account)}")
+
+        self.accounts.append(account)
+        return True
 
     def to_json(self):
         return {
