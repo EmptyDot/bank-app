@@ -2,21 +2,19 @@ import atexit
 import logging
 from typing import Union, Optional
 
-from bank_app.logger import log_exception
 from bank_app import parser_json
 from .account import Account
 from .customer import Customer
-
-
-
+from .exceptions import CustomerNotFoundError
+from .logger import log_exc
 
 
 class Bank:
     def __init__(
-        self,
-        customers: Optional[list[Customer]] = None,
-        save_on_exit: bool = True,
-        save_file_path: Optional[str] = None,
+            self,
+            customers: Optional[list[Customer]] = None,
+            save_on_exit: bool = True,
+            save_file_path: Optional[str] = None,
     ):
         self.customers: list[Customer] = customers if customers else []
         self.current_user: Optional[Customer] = None
@@ -24,7 +22,7 @@ class Bank:
         if save_on_exit:
             atexit.register(parser_json.save_customers, self.customers, save_file_path)
 
-    @log_exception(OSError)
+    @log_exc(exc=OSError, return_value=False)
     def load_customers(self, file_path: Optional[str] = None) -> bool:
         """
         Load the saved customers
@@ -47,7 +45,7 @@ class Bank:
         """
         return self.customers
 
-    @log_exception([TypeError, ValueError])
+    @log_exc(exc=(TypeError, ValueError), return_value=False)
     def add_customer(self, name: str, password: str) -> bool:
         """
         Add a new customer
@@ -60,13 +58,15 @@ class Bank:
             raise ValueError(f"Customer with name {name} already exists.")
 
         if not isinstance(name, str) or not isinstance(password, str):
-            raise TypeError(f"Expected type (str, str), got ({type(name)}, {type(password)})")
+            raise TypeError(
+                f"Expected type (str, str), got ({type(name)}, {type(password)})"
+            )
 
         customer = Customer(name, password)
         self.customers.append(customer)
         return True
 
-    @log_exception(CustomerLookupError, default_return=None)
+    @log_exc(exc=CustomerNotFoundError, return_value=None)
     def get_customer(self, name: str) -> Optional[Customer]:
         """
         Get a customer by name
@@ -77,8 +77,7 @@ class Bank:
             if customer.check_name(name):
                 return customer
 
-        raise CustomerLookupError(name)
-
+        raise CustomerNotFoundError(f"Customer of name {name} not found")
 
     def change_customer_password(self, name: str, new_password: str) -> bool:
         """
@@ -106,7 +105,7 @@ class Bank:
             return True
         return False
 
-    @log_exception(ValueError)
+    @log_exc(exc=ValueError, return_value=False)
     def login(self, name: str, password: str) -> bool:
         """
         If the password matches,
@@ -124,31 +123,30 @@ class Bank:
             raise ValueError("Incorrect password")
         return False
 
-    @log_exception(NoCustomerError)
+    @log_exc(exc=CustomerNotFoundError, return_value=False)
     def logout(self) -> bool:
         """
         Log out the currently logged in customer
         :return: True if successful else False
         """
         if not self.current_user:
-            NoCustomerError("No customer is logged in")
-            return False
+            raise CustomerNotFoundError("No customer is logged in")
 
         self.current_user = None
         return True
 
-    @log_exception()
+    @log_exc(exc=CustomerNotFoundError, return_value=None)
     def get_accounts(self) -> Optional[list[Account]]:
         """
         Get all accounts that belong to the currently logged in customer
         :return: The list of accounts
         """
         if not self.current_user:
-            logger.log_message("No customer is logged in", logging.WARNING)
-            return None
+            raise CustomerNotFoundError("No customer is logged in")
 
         return self.current_user.accounts
 
+    @log_exc(exc=(CustomerNotFoundError, ValueError, TypeError), return_value=False)
     def add_account(self, account_number: int) -> bool:
         """
         Add an account to the currently logged in customer.
@@ -156,24 +154,18 @@ class Bank:
         :return: True if successful else False
         """
         if not self.current_user:
-            logger.log_message("No customer is logged in", logging.WARNING)
-            return False
+            raise CustomerNotFoundError("No customer is logged in", logging.WARNING)
 
         if any(
-            user_account.check_account_number(account_number)
-            for user_account in self.current_user.accounts
+                user_account.check_account_number(account_number)
+                for user_account in self.current_user.accounts
         ):
-            logger.log_message(
-                f"Customer has no account with " f"account number {account_number}",
-                logging.WARNING,
+            raise ValueError(
+                f"Customer has no account with account number {account_number}"
             )
-            return False
 
         if not isinstance(account_number, int):
-            logger.log_message(
-                TypeError(f"Expected type int, got {type(account_number)}")
-            )
-            return False
+            raise TypeError(f"Expected type int, got {type(account_number)}")
 
         acc = Account(account_number)
         return self.current_user.add_account(acc)
@@ -189,6 +181,7 @@ class Bank:
             return True
         return False
 
+    @log_exc(exc=ValueError, return_value=None)
     def get_account(self, account_number: int) -> Optional[Account]:
         """
         Get an account from the currently logged in customer.
@@ -199,12 +192,10 @@ class Bank:
             for account in accounts:
                 if account.check_account_number(account_number):
                     return account
-            logger.log_message(
-                f"Account with account number {account_number} not found.",
-                logging.WARNING,
-            )
+            raise ValueError(f"Account with account number {account_number} not found.")
         return None
 
+    @log_exc(exc=TypeError, return_value=False)
     def deposit(self, account_number: int, amount: Union[int, float]) -> bool:
         """
         Deposit money to an account.
@@ -213,16 +204,14 @@ class Bank:
         :return: True if successful else False
         """
         if not isinstance(amount, (int, float)):
-            logger.log_message(
-                TypeError(f"Expected type (int | float), got {type(amount)}")
-            )
-            return False
+            raise TypeError(f"Expected type (int | float), got {type(amount)}")
 
         if account := self.get_account(account_number):
             return account.balance_add(amount)
 
         return False
 
+    @log_exc(exc=TypeError, return_value=False)
     def withdraw(self, account_number: int, amount: Union[int, float]) -> bool:
         """
         Withdraw money from an account.
@@ -231,10 +220,7 @@ class Bank:
         :return: True if successful else False
         """
         if not isinstance(amount, (int, float)):
-            logger.log_message(
-                TypeError(f"Expected type (int | float), got {type(amount)}")
-            )
-            return False
+            raise TypeError(f"Expected type (int | float), got {type(amount)}")
 
         if account := self.get_account(account_number):
             return account.balance_sub(amount)

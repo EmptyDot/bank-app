@@ -6,10 +6,12 @@ from typing import Optional, Union
 from bank_app import logger
 from .account import Account
 from .customer import Customer
+from .logger import log_exc
 
 DEFAULT_FILE_PATH = "bank_app/data/saved_customers.json"
 
 
+@log_exc(exc=(FileNotFoundError, OSError, JSONDecodeError), return_value=None)
 def load_customers(
     file_path: Optional[str] = None,
 ) -> Optional[list[Customer]]:
@@ -20,25 +22,14 @@ def load_customers(
     """
     file_path = file_path if file_path else DEFAULT_FILE_PATH
 
-    logger.log_message(f"Loading files from {file_path}", logging.INFO)
-    try:
-        with open(file_path, "r", encoding="utf-8") as file:
-            json_str = file.read()
-            customers_json = json.loads(json_str)
-            customers = []
-            for customer_json in customers_json:
-                customers.append(create_customer(**customer_json))
+    with open(file_path, "r", encoding="utf-8") as file:
+        json_str = file.read()
+        customers_json = json.loads(json_str)
+        customers = []
+        for customer_json in customers_json:
+            customers.append(create_customer(**customer_json))
 
-            return customers
-
-    except FileNotFoundError as e:
-        logger.log_message(e)
-    except OSError as e:
-        logger.log_message(e)
-    except JSONDecodeError as e:
-        logger.log_message(e)
-
-    return None
+        return customers
 
 
 def create_customer(
@@ -55,6 +46,7 @@ def create_customer(
     return customer
 
 
+@log_exc(exc=OSError, return_value=False)
 def save_customers(customers: list[Customer], file_path: Optional[str] = None) -> bool:
     """
     Save a list of customers
@@ -66,16 +58,12 @@ def save_customers(customers: list[Customer], file_path: Optional[str] = None) -
         return False
     file_path = file_path if file_path else DEFAULT_FILE_PATH
 
-    logger.log_message(f"Saving customers to {file_path}", logging.INFO)
-    try:
-        with open(file_path, "w", encoding="utf-8") as file:
-            json_str = json.dumps(
-                [customer.to_json() for customer in customers],
-                indent=2,
-            )
-            file.write(json_str)
-            return True
-    except OSError as e:
-        logger.log_message(e)
+    with open(file_path, "w", encoding="utf-8") as file:
+        json_str = json.dumps(
+            [customer.to_json() for customer in customers],
+            indent=2,
+        )
+        file.write(json_str)
+        return True
 
-    return False
+

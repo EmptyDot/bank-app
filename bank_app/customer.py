@@ -1,6 +1,6 @@
 from passlib.hash import bcrypt
 
-from bank_app.logger import log_exception
+from bank_app.logger import log_exc
 from .account import Account
 
 
@@ -38,7 +38,7 @@ class Customer:
         """
         return bcrypt.verify(other_password, self.password)
 
-    @log_exception(TypeError)
+    @log_exc(exc=TypeError, return_value=False)
     def add_account(self, account: Account) -> bool:
         """
         Add a new account to the customer
