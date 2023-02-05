@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-import logging
 from decimal import Decimal, getcontext
 from typing import Union
 
-from bank_app import logger
+from bank_app.logger import log_exc
 
 getcontext()
 
@@ -22,6 +21,7 @@ class Account:
         """
         return float(round(self.__balance, 2))
 
+    @log_exc(exc=ValueError, return_value=False)
     def balance_add(self, amount: Union[int, float]) -> bool:
         """
         Add an amount to the current account balance
@@ -29,12 +29,12 @@ class Account:
         :return: True if successful else False
         """
         if amount <= 0:
-            logger.log_message(f"Amount: {amount} <= 0", logging.WARNING)
-            return False
+            raise ValueError(f"Amount: {amount} <= 0")
 
         self.__balance = self.__balance + Decimal(amount)
         return True
 
+    @log_exc(exc=ValueError, return_value=False)
     def balance_sub(self, amount: Union[int, float]) -> bool:
         """
         Subtract an amount from the current account balance
@@ -42,11 +42,10 @@ class Account:
         :return: True if successful else False
         """
         if amount <= 0:
-            logger.log_message(f"Amount: {amount} <= 0", logging.WARNING)
-            return False
+            raise ValueError(f"Amount: {amount} <= 0")
+
         if amount > self.__balance:
-            logger.log_message(f"Amount: {amount} > {self.balance}", logging.WARNING)
-            return False
+            raise ValueError(f"Amount: {amount} > {self.balance}")
 
         self.__balance = self.__balance - Decimal(amount)
         return True

@@ -1,11 +1,17 @@
-import inspect
+from __future__ import annotations
+
+import functools
 import logging
-import os.path
-from typing import Union
+import pathlib
+import sys
+import tempfile
+import warnings
+from os import PathLike
+from typing import Callable, Any, Iterable, Type
 
 
 def get_logger(
-    name: str = "bankapp", parent_dir_path: str = "bank_app/logs"
+    name: str = "bankapp", parent_dir_path: PathLike[str] = "logs"
 ) -> logging.Logger:
     """
     Get a logger
@@ -14,17 +20,17 @@ def get_logger(
     :return: A logger with the specified name, creating it if necessary.
     """
 
+    path = pathlib.Path(parent_dir_path)
+    path.mkdir(parents=True, exist_ok=True)
+    file_name = name.replace(".", "_") + ".log"
+    log_file_path = path / file_name
+
     logger = logging.getLogger(name)
     logger.setLevel(logging.DEBUG)
-
-    if not os.path.isdir(parent_dir_path):
-        os.mkdir(parent_dir_path)
-
-    file_name = name.replace(".", "_")
-    log_file_path = f"{parent_dir_path}/{file_name}.log"
-
     handler = logging.FileHandler(log_file_path, mode="w")
-    formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+    formatter = logging.Formatter(
+        "%(levelname)s - %(module)s - line %(lineno)d - %(message)s"
+    )
     handler.setFormatter(formatter)
     logger.addHandler(handler)
     return logger
@@ -33,26 +39,49 @@ def get_logger(
 DEFAULT_LOGGER = get_logger()
 
 
-def log_message(
-    message: Union[str, Exception],
-    level: int = logging.ERROR,
-    logger: logging.Logger = DEFAULT_LOGGER,
+def log_exc(
+    _func: Callable | None = None,
+    *,
+    exc: Type[BaseException] | Iterable[Type[BaseException]] = Exception,
+    logger: logging.Logger | None = DEFAULT_LOGGER,
+    raise_exc: bool = False,
+    return_value: Any = None,
 ):
+    """
+    Capture an expected exception, log it and then raise or return.
 
-    stack = inspect.stack()
-    calling_frame = stack[1]
-    module_name = inspect.getmodule(calling_frame[0]).__name__
-    function_name = calling_frame[3]
-    class_name = ""
-    if "self" in calling_frame[0].f_locals:
-        class_name = calling_frame[0].f_locals["self"].__class__.__name__
-    if isinstance(message, str):
-        logger.log(
-            level=level,
-            msg=f"{module_name}.{class_name + '.' if class_name else ''}{function_name}: {message}",
-        )
-    if isinstance(message, Exception):
-        logger.log(
-            level=level,
-            msg=f"{module_name}.{class_name + '.' if class_name else ''}{function_name}: {message.__class__.__name__}: {message}",
-        )
+    :param _func: Enables ability to use as decorator with or without calling, should not be specified manually
+    :param exc: An exception or an iterable of exceptions. This is the exceptions that we want to catch.
+    :param logger: The logger to be used for logging calls
+    :param raise_exc: Will log and return **return_value** if False, log and raise the exception that was caught if True
+    :param return_value: The value to return when an expected exception is caught as long as **raise_exc** is False
+    :return: func value if no exception, **return_value** if expected exception is caught and **raise_exc** is False
+    """
+    def decorator(func: Callable) -> Callable:
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs) -> Any:
+            logger.info(f"Calling {func.__qualname__}", stacklevel=2)
+            try:
+                value = func(*args, **kwargs)
+                return value
+            except Exception as e:
+                logger.error(f"{e.__class__.__name__}: {e}", stacklevel=2)
+                if raise_exc:
+                    raise e
+                if isinstance(exc, Iterable):
+                    if not any(isinstance(e, expected) for expected in exc):
+                        raise e
+                elif issubclass(exc, Exception):
+                    if not isinstance(e, exc):
+                        raise e
+
+            return return_value
+
+        return wrapper
+
+    return decorator if _func is None else decorator(_func)
+
+
+
+
+
