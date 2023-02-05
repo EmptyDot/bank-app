@@ -47,7 +47,17 @@ def log_exc(
     raise_exc: bool = False,
     return_value: Any = None,
 ):
-    def decorator(func: Callable):
+    """
+    Capture an expected exception, log it and then raise or return.
+
+    :param _func: Enables ability to use as decorator with or without calling, should not be specified manually
+    :param exc: An exception or an iterable of exceptions. This is the exceptions that we want to catch.
+    :param logger: The logger to be used for logging calls
+    :param raise_exc: Will log and return **return_value** if False, log and raise the exception that was caught if True
+    :param return_value: The value to return when an expected exception is caught as long as **raise_exc** is False
+    :return: func value if no exception, **return_value** if expected exception is caught and **raise_exc** is False
+    """
+    def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
         def wrapper(*args, **kwargs) -> Any:
             logger.info(f"Calling {func.__qualname__}", stacklevel=2)
